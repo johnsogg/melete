@@ -12,13 +12,22 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "resolveJsonModule": true,
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Support for example app to import @johnsogg/melete */
+    "baseUrl": ".",
+    "paths": {
+      "@johnsogg/melete": ["lib/index.ts"]
+    },
+        /* Sourcemaps for debugging support */
+    "sourceMap": true
   },
-  "include": ["src", "lib"]
+  "include": ["demo", "lib"]
 }

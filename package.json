@@ -1,10 +1,11 @@
 {
   "name": "@johnsogg/melete",
   "version": "0.0.1",
+  "type": "module",
   "description": "A library for rendering 2D graphics (browser and headless)",
   "author": "Gabe Johnson",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "main": "./dist/meleta.umd.js",
   "module": "./dist/meleta.es.js",
   "exports": {
@@ -21,6 +22,7 @@
     "test": "vitest"
   },
   "devDependencies": {
+    "@types/node": "^20.4.3",
     "@typescript-eslint/eslint-plugin": "^8.31.0",
     "@typescript-eslint/parser": "^8.31.0",
     "eslint": "^9.25.1",

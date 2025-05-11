@@ -5,7 +5,7 @@ import prettierConfig from "eslint-config-prettier";
 
 export default tseslint.config(
   {
-    files: ["src/**/*.ts"],
+    files: ["src/**/*.ts", "lib/**/*.ts"],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: "module",
@@ -25,6 +25,7 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "prettier/prettier": "error",
+      "no-console": ["warn", { allow: ["error", "warn"] }],
     },
     settings: {
       "import/resolver": {
