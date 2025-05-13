@@ -1,132 +1,158 @@
-// TODO(gabe): rm bogus code
-export const multiply = (a: number, b: number): number => {
-  return a * b;
+import type { Melete, ResizeFunction } from "./types";
+
+const _resizeFullScreen: ResizeFunction = (canvas: HTMLCanvasElement) => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  return {
+    width: canvas.width,
+    height: canvas.height,
+  };
 };
+
+const _resizeCanvasOffset: ResizeFunction = (canvas: HTMLCanvasElement) => {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  return {
+    width: canvas.width,
+    height: canvas.height,
+  };
+};
+
+// Extract just the string literal types from Melete<T>["resizePolicy"]
+type ResizePolicyStrings<T> = Extract<Melete<T>["resizePolicy"], string>;
+
+// Create a type that requires all string keys with ResizeFunction values
+type ResizePolicyMap<T> = Record<ResizePolicyStrings<T>, ResizeFunction>;
+
+const _resizePolicies: ResizePolicyMap<unknown> = {
+  fullScreen: _resizeFullScreen,
+  static: _resizeCanvasOffset,
+};
+
+interface MeleteOptions<T> {
+  canvasId?: string;
+  canvasParentSelector?: string;
+  initialWidth?: number;
+  initialHeight?: number;
+  style?: string;
+  resizePolicy: Melete<T>["resizePolicy"];
+  model: T;
+}
 
 const _getCanvas = (canvasId: string) => {
   const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
   return canvas;
 };
 
-export interface Pt {
-  x: number;
-  y: number;
-}
-
-export interface LineSegment {
-  start: Pt;
-  end: Pt;
-}
-
-export interface MeleteOptions {
-  canvasId?: string;
-  canvasParentSelector?: string;
-  initialWidth?: number;
-  initialHeight?: number;
-  style?: string;
-  resizePolicy: "fullScreen" | "static" | ResizeFunction;
-}
-
-type ResizeFunction = (canvas: HTMLCanvasElement) => void;
-
-export const fullScreen = (canvas: HTMLCanvasElement) => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+const _blankMelete = <T>(
+  canvasId: string,
+  resizePolicy: Melete<T>["resizePolicy"],
+  model: T,
+): Melete<T> => {
+  return {
+    ...{
+      canvasId,
+      resizePolicy,
+      tick: 0,
+      lastRenderTick: 0,
+      mouse: {
+        position: {
+          x: 0,
+          y: 0,
+        },
+        modifiers: {
+          shift: false,
+          control: false,
+        },
+        leftState: "up",
+        rightState: "up",
+      },
+      mouseEvents: [],
+      keyboard: {
+        keysEngaged: [],
+      },
+      keyboardEvents: [],
+      canvasSize: {
+        width: 0,
+        height: 0,
+      },
+      model,
+      layers: [],
+    },
+  };
 };
 
-export const canvasOffset = (canvas: HTMLCanvasElement) => {
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-};
-
-/**
- * Initialize an instance of melete that has a canvas.
- */
-export const initMelete = ({
+export const initMelete = <T>({
   canvasId = "melete",
   canvasParentSelector = "#app",
-  initialHeight: height = undefined,
-  initialWidth: width = undefined,
-  style = undefined,
-  resizePolicy = "fullScreen",
-}: MeleteOptions) => {
+  initialWidth = 1,
+  initialHeight = 1,
+  resizePolicy = "static",
+  model,
+}: MeleteOptions<T>): Melete<T> => {
+  // make a blank Melete with default values
+  const melete = _blankMelete(canvasId, resizePolicy, model);
+
+  // dynamically create a canvas tag in the indicated parent
   document.querySelector<HTMLDivElement>(`${canvasParentSelector}`)!.innerHTML =
     `
     <canvas 
       id="${canvasId}" 
-      width="${width}" 
-      height="${height}" 
-      ${style ? `style="${style}"` : ""}
+      width="${initialWidth}" 
+      height="${initialHeight}" 
       tabindex="0"></canvas>
   `;
 
+  // when the window is resized, we might need to react
   const resize = () => {
     const canvas = _getCanvas(canvasId);
     if (!canvas) return;
-    switch (resizePolicy) {
-      case "fullScreen":
-        fullScreen(canvas);
-        break;
-      case "static":
-        canvasOffset(canvas);
-        break;
-      default:
-        resizePolicy(canvas);
-    }
-    drawCanvas();
+    // Use the handler from the map or the function itself
+    const handler =
+      typeof resizePolicy === "string"
+        ? _resizePolicies[resizePolicy]
+        : resizePolicy;
+
+    // switch (resizePolicy) {
+    //   case "fullScreen":
+    //     melete.canvasSize = _resizeFullScreen(canvas);
+    //     break;
+    //   case "static":
+    //     melete.canvasSize = _resizeCanvasOffset(canvas);
+    //     break;
+    //   default:
+    //     melete.canvasSize = resizePolicy(canvas);
+    // }
+    melete.canvasSize = handler(canvas);
+    drawMeleteFrame(melete);
   };
 
   window.addEventListener("load", resize);
   window.addEventListener("resize", resize);
 
-  // NOTE: this is not how it should really be done. This is only to show
-  // drawing the different melete instances and to prove to myself that it
-  // works. I'd like to use a rendering stack with pen settings instead of a
-  // simple geometry list.
-  const geometry: Array<LineSegment> = [];
+  return melete;
+};
 
-  const drawCanvas = () => {
-    const canvas = _getCanvas(canvasId);
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 5;
-      // draw a box around the outside of the canvas
-      ctx.strokeRect(0, 0, canvas.width, canvas.height);
+export const drawMeleteFrame = <T>(melete: Melete<T>) => {
+  console.log("Drawing melete: ", melete);
+  const canvas = _getCanvas(melete.canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 5;
+    // draw a box around the outside of the canvas
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-      for (const seg of geometry) {
-        // draw a line on ctx from seg.start to seg.end
-        ctx.beginPath();
-        ctx.moveTo(seg.start.x, seg.start.y);
-        ctx.lineTo(seg.end.x, seg.end.y);
-        ctx.stroke();
-        ctx.closePath();
-      }
-    }
-  };
-
-  const animate = (frameRate: number) => {
-    // check for a reasonable frame rate
-    if (frameRate < 1 || frameRate > 60) {
-      console.error("Frame rate must be between 1 and 60");
-      return;
-    }
-    // invoke drawCanvas at the given frame rate
-    const interval = 1000 / frameRate;
-    setInterval(() => {
-      drawCanvas();
-    }, interval);
-  };
-
-  const addBuffer = () => {};
-
-  return {
-    addBuffer,
-    animate,
-    drawCanvas,
-    geometry,
-  };
+    // for (const seg of geometry) {
+    //   // draw a line on ctx from seg.start to seg.end
+    //   ctx.beginPath();
+    //   ctx.moveTo(seg.start.x, seg.start.y);
+    //   ctx.lineTo(seg.end.x, seg.end.y);
+    //   ctx.stroke();
+    //   ctx.closePath();
+    // }
+  }
 };

@@ -26,6 +26,15 @@ export default tseslint.config(
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "prettier/prettier": "error",
       "no-console": ["warn", { allow: ["error", "warn"] }],
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
     },
     settings: {
       "import/resolver": {

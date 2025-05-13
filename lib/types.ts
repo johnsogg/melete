@@ -1,4 +1,7 @@
 export type Melete<T> = {
+  // ------------------------------- DOM stuff
+  canvasId: string;
+
   // ------------------------------- time stuff
   tick: number;
   lastRenderTick: number;
@@ -11,6 +14,7 @@ export type Melete<T> = {
 
   // ------------------------------- canvas geometry
   canvasSize: Size;
+  resizePolicy: "fullScreen" | "static" | ResizeFunction;
 
   // ------------------------------- user defined model data
   model: T;
@@ -18,6 +22,8 @@ export type Melete<T> = {
   // ------------------------------- drawing layers (buffers)
   layers: Array<Layer>;
 };
+
+export type ResizeFunction = (canvas: HTMLCanvasElement) => Size;
 
 export type Pt = {
   x: number;
@@ -43,8 +49,8 @@ export type KeyboardModifiers = {
 export type MouseData = {
   position: Pt;
   modifiers: KeyboardModifiers;
-  leftState: "down" | "up";
-  rightState: "down" | "up";
+  leftState: "up" | "down";
+  rightState: "up" | "down";
 };
 
 export type KeyEngaged = {
