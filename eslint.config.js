@@ -5,7 +5,7 @@ import prettierConfig from "eslint-config-prettier";
 
 export default tseslint.config(
   {
-    files: ["src/**/*.ts", "lib/**/*.ts"],
+    files: ["demo/**/*.ts", "lib/**/*.ts"],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: "module",
