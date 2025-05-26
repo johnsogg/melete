@@ -29,4 +29,18 @@ bg.draw({
     ],
 });
 
+// A bunch of random lines with coordinates in the range 0..400
+function randomCoord() {
+    return Math.floor(Math.random() * 401);
+}
+
+for (let i = 0; i < 5; i++) {
+    bg.draw({
+        line: {
+            from: { x: randomCoord(), y: randomCoord() },
+            to: { x: randomCoord(), y: randomCoord() },
+        },
+    });
+}
+
 melete.draw();

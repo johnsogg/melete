@@ -1,27 +1,26 @@
-import { defineConfig } from "vite";
 import { resolve } from "path";
 
+import { defineConfig } from "vite";
+
 export default defineConfig({
-  root: "demo",
-  server: {
-    open: true,
-  },
-  // Critical for resolving your local library
-  resolve: {
-    alias: {
-      "@johnsogg/melete": resolve(__dirname, "./lib/index.ts"),
+    root: "demo",
+    server: {
+        open: true,
     },
-  },
-  build: {
-    copyPublicDir: false,
-    lib: {
-      entry: resolve(__dirname, "lib/index.ts"),
-      name: "melete",
-      fileName: (format) => `melete.${format}.js`,
-      formats: ["es"],
+    resolve: {
+        alias: {
+            "@johnsogg/melete": resolve(__dirname, "./lib/index.ts"),
+            "~": resolve(__dirname, "./lib"),
+        },
     },
-    // Generate sourcemaps for easier debugging
-    sourcemap: true,
-    // Exclude peer dependencies from the bundle
-  },
+    build: {
+        copyPublicDir: false,
+        lib: {
+            entry: resolve(__dirname, "lib/index.ts"),
+            name: "melete",
+            fileName: (format) => `melete.${format}.js`,
+            formats: ["es"],
+        },
+        sourcemap: true,
+    },
 });
