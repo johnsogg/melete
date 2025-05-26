@@ -35,6 +35,9 @@ export default tseslint.config(
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+      // Enforce 4 spaces for indentation
+      indent: ["error", 4],
+      "@typescript-eslint/indent": ["error", 4],
     },
     settings: {
       "import/resolver": {
