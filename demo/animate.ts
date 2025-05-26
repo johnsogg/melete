@@ -4,9 +4,9 @@ import "./style.css";
 import { initMelete } from "@johnsogg/melete";
 
 const melete = initMelete({
-  initialWidth: window.innerWidth,
-  initialHeight: window.innerHeight,
-  resizePolicy: "fullScreen",
+    initialWidth: window.innerWidth,
+    initialHeight: window.innerHeight,
+    resizePolicy: "fullScreen",
 });
 
 // An animation is all about drawing to a buffer over and over.
