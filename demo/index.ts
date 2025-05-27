@@ -2,7 +2,7 @@
 
 import "./style.css";
 
-import { Melete } from "@johnsogg/melete";
+import { Melete } from "../lib"; // Adjusted import path
 
 const melete = new Melete({
     domId: "charming",
@@ -30,9 +30,11 @@ bg.draw({
 });
 
 // change the pen color
-bg.setPen({
-    stroke: "red",
-    thickness: 2,
+bg.draw({
+    pen: {
+        stroke: "red",
+        thickness: 2,
+    },
 });
 
 // A bunch of random lines with coordinates in the range 0..400
@@ -40,7 +42,20 @@ function randomCoord() {
     return Math.floor(Math.random() * 401);
 }
 
+// function to make a random hsl color that is pretty light
+function randomLightColor() {
+    const h = Math.floor(Math.random() * 360);
+    const s = Math.floor(Math.random() * 50) + 50; // Saturation between 50% and 100%
+    const l = Math.floor(Math.random() * 50) + 50; // Lightness between 50% and 100%
+    return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
 for (let i = 0; i < 5; i++) {
+    bg.draw({
+        pen: {
+            stroke: randomLightColor(),
+        },
+    });
     bg.draw({
         line: {
             from: { x: randomCoord(), y: randomCoord() },

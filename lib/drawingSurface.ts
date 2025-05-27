@@ -13,7 +13,6 @@ import {
     ImageBuffer,
     Matrix,
     NamedLocation,
-    PenOp,
     Pt,
     RenderContext,
     TurtleOp,
@@ -26,7 +25,7 @@ export class DrawingSurface {
     // drawing data
     #drawOps: Array<DrawOp> = [];
     #xfm: Matrix = identityMatrix();
-    #pens: Array<PenOp> = [];
+    // #pens: Array<PenOp> = [];
 
     public constructor(public readonly name: string) {}
 
@@ -51,8 +50,17 @@ export class DrawingSurface {
     ): Record<string, NamedLocation> {
         const namedLocations: Record<string, NamedLocation> = {};
 
-        // this is a draw op, so we need to run it.
-        if (ctx && spec.line) {
+        if (ctx && spec.pen) {
+            if (spec.pen.stroke != null) {
+                ctx.strokeStyle = spec.pen.stroke;
+            }
+            if (spec.pen.thickness != null) {
+                ctx.lineWidth = spec.pen.thickness;
+            }
+            if (spec.pen.fill != null) {
+                ctx.fillStyle = spec.pen.fill || "transparent";
+            }
+        } else if (ctx && spec.line) {
             drawLine({ surf: this, ctx, namedLocations, geom: spec.line });
         } else if (ctx && spec.turtles) {
             drawTurtles({
@@ -84,22 +92,22 @@ export class DrawingSurface {
     // rotate(_factor: number | RotationSpec) {}
     // adjustCamera(_cameraSpec: CameraSpec) {}
 
-    setPen(pen: PenOp) {
-        if (this.#pens.length) {
-            const combined = { ...this.#pens.at(-1), pen };
-            this.#pens.push(combined);
-        } else {
-            this.#pens.push(pen);
-        }
-    }
+    // setPen(pen: PenOp) {
+    //     if (this.#pens.length) {
+    //         const combined = { ...this.#pens.at(-1), pen };
+    //         this.#pens.push(combined);
+    //     } else {
+    //         this.#pens.push(pen);
+    //     }
+    // }
 
-    popPen() {
-        if (this.#pens.length) {
-            this.#pens.pop();
-        } else {
-            console.warn("Warning: popping from empty pen stack");
-        }
-    }
+    // popPen() {
+    //     if (this.#pens.length) {
+    //         this.#pens.pop();
+    //     } else {
+    //         console.warn("Warning: popping from empty pen stack");
+    //     }
+    // }
 
     findNamedPoint(_name: string): Pt {
         return { x: 0, y: 0 };
