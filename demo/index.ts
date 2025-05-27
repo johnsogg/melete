@@ -29,6 +29,12 @@ bg.draw({
     ],
 });
 
+// change the pen color
+bg.setPen({
+    stroke: "red",
+    thickness: 2,
+});
+
 // A bunch of random lines with coordinates in the range 0..400
 function randomCoord() {
     return Math.floor(Math.random() * 401);

@@ -1,27 +1,22 @@
 import { drawLine } from "./draw/line";
-import { drawTurtles } from "./draw/turtles";
+import { drawTurtleCursor, drawTurtles } from "./draw/turtles"; // Added drawTurtleCursor import
 import {
     currentPosition,
+    degreesToRadians,
     identityMatrix,
     multiplyMatrices,
-    transformDirection,
-    transformPoint,
-    translationMatrix,
-    degreesToRadians,
     rotationMatrix,
+    translationMatrix,
 } from "./matrix";
 import {
     DrawOp,
-    EventHandlers,
     ImageBuffer,
     Matrix,
     NamedLocation,
     PenOp,
     Pt,
     RenderContext,
-    RotationSpec,
     TurtleOp,
-    Vec,
 } from "./types";
 
 /**
@@ -31,11 +26,8 @@ export class DrawingSurface {
     // drawing data
     #drawOps: Array<DrawOp> = [];
     #xfm: Matrix = identityMatrix();
+    #pens: Array<PenOp> = [];
 
-    /**
-     * Creates a new drawing surface with the given name.
-     * @param name The name of the drawing surface.
-     */
     public constructor(public readonly name: string) {}
 
     get xfm(): Readonly<Matrix> {
@@ -44,8 +36,6 @@ export class DrawingSurface {
 
     /**
      * Adds a drawing operation to this surface and executes it.
-     * @param spec The drawing operation specification.
-     * @returns A record of named locations created during execution.
      */
     draw(spec: DrawOp): Record<string, NamedLocation> {
         this.#drawOps.push(spec);
@@ -53,24 +43,7 @@ export class DrawingSurface {
     }
 
     /**
-     * Redraws the surface.
-     */
-    redraw() {}
-
-    /**
-     * Plans a drawing operation without recording or executing it.
-     * @param _spec The drawing operation specification.
-     * @returns An empty record of named locations.
-     */
-    plan(_spec: DrawOp): Record<string, NamedLocation> {
-        return {};
-    }
-
-    /**
      * Executes a drawing operation on the given context.
-     * @param spec The drawing operation specification.
-     * @param ctx Optional canvas context to draw on.
-     * @returns A record of named locations created during execution.
      */
     private execute(
         spec: DrawOp,
@@ -93,11 +66,6 @@ export class DrawingSurface {
         return namedLocations;
     }
 
-    /**
-     * Saves the current image buffer.
-     * @param _name Optional name for the saved buffer.
-     * @returns An empty image buffer.
-     */
     saveImageBuffer(_name?: string): ImageBuffer {
         return {
             colorSpace: "rgb",
@@ -106,142 +74,40 @@ export class DrawingSurface {
         };
     }
 
-    /**
-     * Finds an image buffer by name.
-     * @param _name The name of the image buffer to find.
-     * @returns Null, as this is not yet implemented.
-     */
     findImageBuffer(_name: string): ImageBuffer | null {
         return null;
     }
 
-    /**
-     * Event handlers for this drawing surface.
-     */
-    events: EventHandlers = {};
+    // camera operations - Keep this as I plan on implementing it.
+    // zoom(_factor: number) {}
+    // pan(_pan: Vec) {}
+    // rotate(_factor: number | RotationSpec) {}
+    // adjustCamera(_cameraSpec: CameraSpec) {}
 
-    /**
-     * Adjusts the zoom factor of the camera.
-     * @param _factor The zoom factor.
-     */
-    zoom(_factor: number) {}
+    setPen(pen: PenOp) {
+        if (this.#pens.length) {
+            const combined = { ...this.#pens.at(-1), pen };
+            this.#pens.push(combined);
+        } else {
+            this.#pens.push(pen);
+        }
+    }
 
-    /**
-     * Pans the camera.
-     * @param _pan The panning vector.
-     */
-    pan(_pan: Vec) {}
+    popPen() {
+        if (this.#pens.length) {
+            this.#pens.pop();
+        } else {
+            console.warn("Warning: popping from empty pen stack");
+        }
+    }
 
-    /**
-     * Rotates the camera.
-     * @param _factor The rotation factor or specification.
-     */
-    rotate(_factor: number | RotationSpec) {}
-
-    /**
-     * Adjusts the camera according to the given specification.
-     * @param _cameraSpec The camera specification.
-     */
-    adjustCamera(_cameraSpec: any) {}
-
-    /**
-     * Sets the pen properties.
-     * @param _pen The pen properties.
-     */
-    setPen(_pen: PenOp) {}
-
-    /**
-     * Finds a named point.
-     * @param _name The name of the point to find.
-     * @returns A default point at (0, 0).
-     */
     findNamedPoint(_name: string): Pt {
         return { x: 0, y: 0 };
     }
 
     /**
-     * Gets the current location.
-     * @returns A default point at (0, 0).
-     */
-    getCurrentLocation(): Pt {
-        return { x: 0, y: 0 };
-    }
-
-    /**
-     * Draws a triangular cursor representing the turtle at its current position and direction.
-     * @param turtleXfm The transformation matrix representing the turtle's state
-     * @param ctx The canvas context to draw on
-     */
-    drawTurtleCursor(turtleXfm: Matrix, ctx: RenderContext) {
-        // Get the current position from the matrix
-        const position = currentPosition(turtleXfm);
-
-        // Get the current direction vector (facing direction)
-        const direction = transformDirection(turtleXfm, { dx: 0, dy: -1 });
-
-        // Define the size of the turtle cursor
-        const size = 30;
-
-        // Calculate perpendicular vector for the triangle's base
-        const perpendicular = { dx: -direction.dy, dy: direction.dx };
-
-        // Define the three points of the triangle
-        // The tip of the triangle should point in the direction the turtle is facing
-        const tip = {
-            x: position.x + direction.dx * size,
-            y: position.y + direction.dy * size,
-        };
-
-        // The base corners are behind the tip, perpendicular to the direction
-        const baseCorner1 = {
-            x:
-                position.x -
-                direction.dx * (size / 2) +
-                perpendicular.dx * (size / 2),
-            y:
-                position.y -
-                direction.dy * (size / 2) +
-                perpendicular.dy * (size / 2),
-        };
-
-        const baseCorner2 = {
-            x:
-                position.x -
-                direction.dx * (size / 2) -
-                perpendicular.dx * (size / 2),
-            y:
-                position.y -
-                direction.dy * (size / 2) -
-                perpendicular.dy * (size / 2),
-        };
-
-        // Save the current context state
-        ctx.save();
-
-        // Set the style for the turtle cursor
-        ctx.fillStyle = "rgba(255, 255, 0, 0.7)"; // Semi-transparent yellow
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 1;
-
-        // Draw the triangle
-        ctx.beginPath();
-        ctx.moveTo(tip.x, tip.y);
-        ctx.lineTo(baseCorner1.x, baseCorner1.y);
-        ctx.lineTo(baseCorner2.x, baseCorner2.y);
-        ctx.closePath();
-
-        // Fill and stroke the triangle
-        ctx.fill();
-        ctx.stroke();
-
-        // Restore the context state
-        ctx.restore();
-    }
-
-    /**
      * This is the DrawingSurface method that is used to push pixels to an actual
      * canvas drawing context.
-     * @param ctx The canvas rendering context to draw on.
      */
     render(ctx: CanvasRenderingContext2D) {
         // this is where the actual drawing happens. it has useful info like size.
@@ -305,7 +171,7 @@ export class DrawingSurface {
                 });
 
                 // Draw the turtle cursor at its final position
-                this.drawTurtleCursor(turtleXfm, offscreen);
+                drawTurtleCursor(turtleXfm, offscreen); // Updated call
             }
 
             this.execute(op, offscreen);

@@ -16,6 +16,34 @@ import {
     TurtleSequenceOp,
 } from "~/types";
 
+export const drawTurtles = ({
+    surf,
+    ctx,
+    namedLocations,
+    geom: turtles,
+}: RenderSupport<TurtleSequenceOp>) => {
+    // Initialize a matrix for tracking turtle state
+    let turtleXfm = { ...surf.xfm };
+    let penDown = true;
+
+    turtles.forEach((turtleOp) => {
+        if (turtleOp.op === "name" && turtleOp.name) {
+            handleNameOperation(turtleXfm, turtleOp.name, namedLocations);
+        } else if (turtleOp.op === "move") {
+            turtleXfm = handleMoveOperation({
+                turtleXfm,
+                distance: turtleOp.move,
+                ctx,
+                penDown,
+            });
+        } else if (turtleOp.op === "turn") {
+            turtleXfm = handleTurnOperation(turtleXfm, turtleOp.turn);
+        } else if (turtleOp.op === "penState") {
+            penDown = handlePenStateOperation(turtleOp.penState);
+        }
+    });
+};
+
 const handleNameOperation = (
     turtleXfm: Matrix,
     name: string,
@@ -32,12 +60,17 @@ const handleNameOperation = (
     };
 };
 
-const handleMoveOperation = (
-    turtleXfm: Matrix,
-    distance: number,
-    ctx: RenderContext,
-    penDown: boolean
-): Matrix => {
+const handleMoveOperation = ({
+    turtleXfm,
+    distance,
+    ctx,
+    penDown,
+}: {
+    turtleXfm: Matrix;
+    distance: number;
+    ctx?: RenderContext;
+    penDown: boolean;
+}): Matrix => {
     const currentPos = currentPosition(turtleXfm);
     const forwardOffset = { x: 0, y: -distance };
     const newPos = transformPoint(turtleXfm, forwardOffset);
@@ -103,30 +136,71 @@ const handlePenStateOperation = (penState: string): boolean => {
     return penState === "down";
 };
 
-export const drawTurtles = ({
-    surf,
-    ctx,
-    namedLocations,
-    geom: turtles,
-}: RenderSupport<TurtleSequenceOp>) => {
-    // Initialize a matrix for tracking turtle state
-    let turtleXfm = { ...surf.xfm };
-    let penDown = true;
+/**
+ * Draws a triangular cursor representing the turtle at its current position and direction.
+ */
+export const drawTurtleCursor = (turtleXfm: Matrix, ctx: RenderContext) => {
+    // Get the current position from the matrix
+    const position = currentPosition(turtleXfm);
 
-    turtles.forEach((turtleOp) => {
-        if (turtleOp.op === "name" && turtleOp.name) {
-            handleNameOperation(turtleXfm, turtleOp.name, namedLocations);
-        } else if (turtleOp.op === "move") {
-            turtleXfm = handleMoveOperation(
-                turtleXfm,
-                turtleOp.move,
-                ctx,
-                penDown
-            );
-        } else if (turtleOp.op === "turn") {
-            turtleXfm = handleTurnOperation(turtleXfm, turtleOp.turn);
-        } else if (turtleOp.op === "penState") {
-            penDown = handlePenStateOperation(turtleOp.penState);
-        }
-    });
+    // Get the current direction vector (facing direction)
+    const direction = transformDirection(turtleXfm, { dx: 0, dy: -1 });
+
+    // Define the size of the turtle cursor
+    const size = 30;
+
+    // Calculate perpendicular vector for the triangle's base
+    const perpendicular = { dx: -direction.dy, dy: direction.dx };
+
+    // Define the three points of the triangle
+    // The tip of the triangle should point in the direction the turtle is facing
+    const tip = {
+        x: position.x + direction.dx * size,
+        y: position.y + direction.dy * size,
+    };
+
+    // The base corners are behind the tip, perpendicular to the direction
+    const baseCorner1 = {
+        x:
+            position.x -
+            direction.dx * (size / 2) +
+            perpendicular.dx * (size / 2),
+        y:
+            position.y -
+            direction.dy * (size / 2) +
+            perpendicular.dy * (size / 2),
+    };
+
+    const baseCorner2 = {
+        x:
+            position.x -
+            direction.dx * (size / 2) -
+            perpendicular.dx * (size / 2),
+        y:
+            position.y -
+            direction.dy * (size / 2) -
+            perpendicular.dy * (size / 2),
+    };
+
+    // Save the current context state
+    ctx.save();
+
+    // Set the style for the turtle cursor
+    ctx.fillStyle = "rgba(255, 255, 0, 0.7)"; // Semi-transparent yellow
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+
+    // Draw the triangle
+    ctx.beginPath();
+    ctx.moveTo(tip.x, tip.y);
+    ctx.lineTo(baseCorner1.x, baseCorner1.y);
+    ctx.lineTo(baseCorner2.x, baseCorner2.y);
+    ctx.closePath();
+
+    // Fill and stroke the triangle
+    ctx.fill();
+    ctx.stroke();
+
+    // Restore the context state
+    ctx.restore();
 };

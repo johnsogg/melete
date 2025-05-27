@@ -8,7 +8,7 @@ export type RenderContext =
 
 export type RenderSupport<T> = {
     surf: DrawingSurface;
-    ctx: RenderContext;
+    ctx?: RenderContext;
     namedLocations: Record<string, NamedLocation>;
     geom: T;
 };
