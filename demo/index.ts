@@ -1,8 +1,16 @@
-// this is the demo code and is what an end user would write
+// this is the demo code and is what an end user would write. it runs in a
+// browser context.
 
 import "./style.css";
 
 import { Melete } from "../lib"; // Adjusted import path
+
+const config = {
+    turtleTest: true,
+    randomLines: true,
+    lineAsterisk: true,
+    namedLocationsTest: true,
+};
 
 const melete = new Melete({
     domId: "charming",
@@ -11,31 +19,25 @@ const melete = new Melete({
 
 const bg = melete.getDefaultLayer();
 
-// Try to draw a simple square
-bg.draw({
-    turtles: [
-        // Start by moving to initialize position
-        { op: "turn", turn: 180 },
-        { op: "move", move: 100 },
-        // Draw a square (90 degree turns, equal length sides)
-        { op: "turn", turn: -90 },
-        { op: "move", move: 100 },
-        { op: "turn", turn: -90 },
-        { op: "move", move: 100 },
-        { op: "turn", turn: -90 },
-        { op: "move", move: 100 },
-        // Return to original orientation
-        { op: "turn", turn: 90 },
-    ],
-});
-
-// change the pen color
-bg.draw({
-    pen: {
-        stroke: "red",
-        thickness: 2,
-    },
-});
+if (config.turtleTest) {
+    // Try to draw a simple square
+    bg.draw({
+        turtles: [
+            // Start by moving to initialize position
+            { op: "turn", turn: 180 },
+            { op: "move", move: 100 },
+            // Draw a square (90 degree turns, equal length sides)
+            { op: "turn", turn: -90 },
+            { op: "move", move: 100 },
+            { op: "turn", turn: -90 },
+            { op: "move", move: 100 },
+            { op: "turn", turn: -90 },
+            { op: "move", move: 100 },
+            // Return to original orientation
+            { op: "turn", turn: 90 },
+        ],
+    });
+}
 
 // A bunch of random lines with coordinates in the range 0..400
 function randomCoord() {
@@ -50,18 +52,76 @@ function randomLightColor() {
     return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
-for (let i = 0; i < 5; i++) {
+if (config.randomLines) {
+    // change the pen color
     bg.draw({
         pen: {
-            stroke: randomLightColor(),
+            stroke: "red",
+            thickness: 2,
         },
     });
-    bg.draw({
-        line: {
-            from: { x: randomCoord(), y: randomCoord() },
-            to: { x: randomCoord(), y: randomCoord() },
-        },
-    });
+    for (let i = 0; i < 5; i++) {
+        bg.draw({
+            pen: {
+                stroke: randomLightColor(),
+            },
+        });
+        bg.draw({
+            line: {
+                from: { x: randomCoord(), y: randomCoord() },
+                to: { x: randomCoord(), y: randomCoord() },
+            },
+        });
+    }
 }
 
+// test of setPen
+
+if (config.lineAsterisk) {
+    // get the canvas center
+    const canvas = melete.canvasSize;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const n = 15;
+    const thingLen = 50;
+    for (let i = 0; i < n; i++) {
+        bg.setPen({
+            thickness: i + 1,
+            stroke: randomLightColor(),
+        });
+        bg.draw({
+            line: {
+                from: { x: centerX, y: centerY },
+                to: {
+                    x: centerX + thingLen * Math.cos((i / n) * 2 * Math.PI),
+                    y: centerY + thingLen * Math.sin((i / n) * 2 * Math.PI),
+                },
+            },
+        });
+    }
+}
+
+if (config.namedLocationsTest) {
+    const spots = bg.draw({
+        turtles: [
+            // Start by moving to initialize position
+            { op: "turn", turn: 180 },
+            { op: "move", move: 100 },
+            { op: "turn", turn: -90 },
+            { op: "move", move: 400 },
+            { op: "turn", turn: 90 },
+            { op: "move", move: 100 },
+            // Draw a square (90 degree turns, equal length sides)
+            { op: "turn", turn: -90 },
+            { op: "move", move: 100 },
+            { op: "name", name: "groovy" },
+            { op: "turn", turn: -90 },
+            { op: "move", move: 100 },
+            { op: "turn", turn: -90 },
+            { op: "move", move: 50 },
+            { op: "face", face: "groovy" },
+            { op: "move", move: 150 },
+        ],
+    });
+}
 melete.draw();

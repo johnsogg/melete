@@ -40,8 +40,24 @@ export const drawTurtles = ({
             turtleXfm = handleTurnOperation(turtleXfm, turtleOp.turn);
         } else if (turtleOp.op === "penState") {
             penDown = handlePenStateOperation(turtleOp.penState);
+        } else if (turtleOp.op === "face") {
+            const spot = namedLocations[turtleOp.face];
+            if (spot) {
+                // Calculate a rotation matrix to face the named location
+                const currentPos = currentPosition(turtleXfm);
+                const targetPos = spot.position;
+                const dx = currentPos.x - targetPos.x;
+                const dy = currentPos.y - targetPos.y;
+
+                const angleRadians = Math.atan2(dy, dx);
+                turtleXfm = handleTurnOperation(turtleXfm, {
+                    radians: angleRadians,
+                });
+            }
         }
     });
+    // It would be nice if this was a debugging option
+    if (ctx) drawTurtleCursor(turtleXfm, ctx);
 };
 
 const handleNameOperation = (
@@ -107,7 +123,6 @@ const handleTurnOperation = (
             angleRadians = turn.radians;
         }
     }
-
     const currentPos = currentPosition(turtleXfm);
     const rot = rotationMatrix(angleRadians);
 

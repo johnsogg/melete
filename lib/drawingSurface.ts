@@ -1,21 +1,14 @@
 import { drawLine } from "./draw/line";
-import { drawTurtleCursor, drawTurtles } from "./draw/turtles"; // Added drawTurtleCursor import
-import {
-    currentPosition,
-    degreesToRadians,
-    identityMatrix,
-    multiplyMatrices,
-    rotationMatrix,
-    translationMatrix,
-} from "./matrix";
+import { drawTurtles } from "./draw/turtles"; // Added drawTurtleCursor import
+import { identityMatrix } from "./matrix";
 import {
     DrawOp,
     ImageBuffer,
     Matrix,
     NamedLocation,
+    PenOp,
     Pt,
     RenderContext,
-    TurtleOp,
 } from "./types";
 
 /**
@@ -25,12 +18,17 @@ export class DrawingSurface {
     // drawing data
     #drawOps: Array<DrawOp> = [];
     #xfm: Matrix = identityMatrix();
+    #namedLocations: Record<string, NamedLocation> = {};
     // #pens: Array<PenOp> = [];
 
     public constructor(public readonly name: string) {}
 
     get xfm(): Readonly<Matrix> {
         return { ...this.#xfm };
+    }
+
+    setPen(penOp: PenOp): void {
+        this.#drawOps.push({ pen: penOp });
     }
 
     /**
@@ -48,8 +46,8 @@ export class DrawingSurface {
         spec: DrawOp,
         ctx?: RenderContext
     ): Record<string, NamedLocation> {
-        const namedLocations: Record<string, NamedLocation> = {};
-
+        // const namedLocations: Record<string, NamedLocation> = {};
+        const namedLocations = this.#namedLocations;
         if (ctx && spec.pen) {
             if (spec.pen.stroke != null) {
                 ctx.strokeStyle = spec.pen.stroke;
@@ -69,8 +67,8 @@ export class DrawingSurface {
                 namedLocations,
                 geom: spec.turtles,
             });
-            // TODO: need to add namedLocations to the RenderSupport type and pass it in
         }
+
         return namedLocations;
     }
 
@@ -92,23 +90,6 @@ export class DrawingSurface {
     // rotate(_factor: number | RotationSpec) {}
     // adjustCamera(_cameraSpec: CameraSpec) {}
 
-    // setPen(pen: PenOp) {
-    //     if (this.#pens.length) {
-    //         const combined = { ...this.#pens.at(-1), pen };
-    //         this.#pens.push(combined);
-    //     } else {
-    //         this.#pens.push(pen);
-    //     }
-    // }
-
-    // popPen() {
-    //     if (this.#pens.length) {
-    //         this.#pens.pop();
-    //     } else {
-    //         console.warn("Warning: popping from empty pen stack");
-    //     }
-    // }
-
     findNamedPoint(_name: string): Pt {
         return { x: 0, y: 0 };
     }
@@ -118,7 +99,6 @@ export class DrawingSurface {
      * canvas drawing context.
      */
     render(ctx: CanvasRenderingContext2D) {
-        // this is where the actual drawing happens. it has useful info like size.
         const canvas = ctx.canvas;
 
         // make an offscreen buffer to draw onto that is independent of others.
@@ -133,55 +113,6 @@ export class DrawingSurface {
 
         // Execute everything using this offscreen context
         for (const op of this.#drawOps) {
-            // For turtle operations, draw the cursor at the final position
-            if (op.turtles && op.turtles.length > 0) {
-                // Initialize a matrix for tracking turtle state
-                let turtleXfm = { ...this.#xfm };
-
-                // Process all turtle operations to get the final transform
-                op.turtles.forEach((turtleOp: TurtleOp) => {
-                    if (turtleOp.op === "move") {
-                        const distance = turtleOp.move;
-                        const forwardOffset = { x: 0, y: -distance };
-                        const translationMat = translationMatrix({
-                            dx: forwardOffset.x,
-                            dy: forwardOffset.y,
-                        });
-                        turtleXfm = multiplyMatrices(turtleXfm, translationMat);
-                    } else if (turtleOp.op === "turn") {
-                        let angleRadians = 0;
-                        if (typeof turtleOp.turn === "number") {
-                            angleRadians = degreesToRadians(turtleOp.turn);
-                        } else if (turtleOp.turn) {
-                            if (turtleOp.turn.degrees !== undefined) {
-                                angleRadians = degreesToRadians(
-                                    turtleOp.turn.degrees
-                                );
-                            } else if (turtleOp.turn.radians !== undefined) {
-                                angleRadians = turtleOp.turn.radians;
-                            }
-                        }
-                        const currentPos = currentPosition(turtleXfm);
-                        const rot = rotationMatrix(angleRadians);
-                        const toOrigin = translationMatrix({
-                            dx: -currentPos.x,
-                            dy: -currentPos.y,
-                        });
-                        const fromOrigin = translationMatrix({
-                            dx: currentPos.x,
-                            dy: currentPos.y,
-                        });
-                        const step1 = multiplyMatrices(toOrigin, turtleXfm);
-                        const step2 = multiplyMatrices(rot, step1);
-                        turtleXfm = multiplyMatrices(fromOrigin, step2);
-                    }
-                    // Skip tracking penDown state since we're only interested in the final position
-                });
-
-                // Draw the turtle cursor at its final position
-                drawTurtleCursor(turtleXfm, offscreen); // Updated call
-            }
-
             this.execute(op, offscreen);
         }
 
