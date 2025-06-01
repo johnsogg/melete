@@ -50,15 +50,19 @@ export type LineOp = {
     to: Pt;
 };
 
-export type ImageBuffer = {
-    data: number[];
-    colorSpace: string;
-    size: Size;
+// This is badly named, now that I have SaveImageBufferOp. This should be
+// DrawImageBufferOp or such.
+export type ImageBufferOp = {
+    // buffer: ImageData;
+    name: string;
+    topLeft: Pt;
+    size?: Size;
 };
 
-export type ImageBufferOp = {
-    buffer: ImageBuffer;
-    // position, size?
+export type SaveImageBufferOp = {
+    name: string;
+    topLeft: Pt;
+    size: Size;
 };
 
 export type PenOp = {
@@ -86,6 +90,7 @@ export type DrawOp = {
     turtles?: TurtleSequenceOp;
     geometry?: Array<DrawOp>;
     image?: ImageBufferOp;
+    saveImage?: SaveImageBufferOp;
 };
 
 export type RotationSpec = {

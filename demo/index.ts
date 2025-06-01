@@ -10,6 +10,7 @@ const config = {
     randomLines: true,
     lineAsterisk: true,
     namedLocationsTest: true,
+    imageBufferTest: true,
 };
 
 const melete = new Melete({
@@ -102,7 +103,7 @@ if (config.lineAsterisk) {
 }
 
 if (config.namedLocationsTest) {
-    const spots = bg.draw({
+    bg.draw({
         turtles: [
             // Start by moving to initialize position
             { op: "turn", turn: 180 },
@@ -124,4 +125,24 @@ if (config.namedLocationsTest) {
         ],
     });
 }
+
+if (config.imageBufferTest) {
+    const canvas = melete.canvasSize;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    bg.saveImageBuffer({
+        name: "kermit",
+        topLeft: { x: centerX - 50, y: centerY - 50 },
+        size: { width: 100, height: 100 },
+    });
+    for (let i = 0; i < 5; i++) {
+        bg.draw({
+            image: {
+                name: "kermit",
+                topLeft: { x: i * 100, y: 500 },
+            },
+        });
+    }
+}
+
 melete.draw();

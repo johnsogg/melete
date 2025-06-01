@@ -23,7 +23,6 @@ export type {
     CameraSpec,
     NamedLocation,
     EventHandlers,
-    ImageBuffer,
     Matrix,
 } from "./types";
 

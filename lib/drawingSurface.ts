@@ -1,14 +1,17 @@
+import { drawImage } from "./draw/image";
 import { drawLine } from "./draw/line";
+import { drawSaveImage } from "./draw/saveImage";
 import { drawTurtles } from "./draw/turtles"; // Added drawTurtleCursor import
 import { identityMatrix } from "./matrix";
+import { debugImageCache } from "./tools/debugImageCache";
 import {
     DrawOp,
-    ImageBuffer,
     Matrix,
     NamedLocation,
     PenOp,
     Pt,
     RenderContext,
+    Size,
 } from "./types";
 
 /**
@@ -19,7 +22,7 @@ export class DrawingSurface {
     #drawOps: Array<DrawOp> = [];
     #xfm: Matrix = identityMatrix();
     #namedLocations: Record<string, NamedLocation> = {};
-    // #pens: Array<PenOp> = [];
+    #namedImages: Map<string, ImageData> = new Map();
 
     public constructor(public readonly name: string) {}
 
@@ -31,22 +34,20 @@ export class DrawingSurface {
         this.#drawOps.push({ pen: penOp });
     }
 
-    /**
-     * Adds a drawing operation to this surface and executes it.
-     */
-    draw(spec: DrawOp): Record<string, NamedLocation> {
-        this.#drawOps.push(spec);
-        return this.execute(spec);
+    cacheImageBuffer(name: string, imageBuffer: ImageData) {
+        this.#namedImages.set(name, imageBuffer);
+        debugImageCache(this.#namedImages);
     }
 
-    /**
-     * Executes a drawing operation on the given context.
-     */
-    private execute(
+    async draw(spec: DrawOp): Promise<Record<string, NamedLocation>> {
+        this.#drawOps.push(spec);
+        return await this.execute(spec);
+    }
+
+    private async execute(
         spec: DrawOp,
         ctx?: RenderContext
-    ): Record<string, NamedLocation> {
-        // const namedLocations: Record<string, NamedLocation> = {};
+    ): Promise<Record<string, NamedLocation>> {
         const namedLocations = this.#namedLocations;
         if (ctx && spec.pen) {
             if (spec.pen.stroke != null) {
@@ -67,21 +68,50 @@ export class DrawingSurface {
                 namedLocations,
                 geom: spec.turtles,
             });
+        } else if (ctx && spec.saveImage) {
+            drawSaveImage({
+                ctx,
+                geom: spec.saveImage,
+                surf: this,
+                namedLocations,
+            });
+        } else if (ctx && spec.image) {
+            await drawImage({
+                ctx,
+                geom: spec.image,
+                surf: this,
+                namedLocations,
+            });
+        } else if (ctx) {
+            console.warn(
+                "Drawing surface can't yet process instruction:\n",
+                JSON.stringify(spec, null, 4)
+            );
         }
 
         return namedLocations;
     }
 
-    saveImageBuffer(_name?: string): ImageBuffer {
-        return {
-            colorSpace: "rgb",
-            data: [],
-            size: { width: 0, height: 0 },
-        };
+    saveImageBuffer({
+        name,
+        topLeft,
+        size,
+    }: {
+        name: string;
+        topLeft: Pt;
+        size: Size;
+    }) {
+        this.#drawOps.push({
+            saveImage: {
+                name,
+                size,
+                topLeft,
+            },
+        });
     }
 
-    findImageBuffer(_name: string): ImageBuffer | null {
-        return null;
+    findImageBuffer(name: string): ImageData | undefined {
+        return this.#namedImages.get(name);
     }
 
     // camera operations - Keep this as I plan on implementing it.
@@ -98,7 +128,7 @@ export class DrawingSurface {
      * This is the DrawingSurface method that is used to push pixels to an actual
      * canvas drawing context.
      */
-    render(ctx: CanvasRenderingContext2D) {
+    async render(ctx: CanvasRenderingContext2D) {
         const canvas = ctx.canvas;
 
         // make an offscreen buffer to draw onto that is independent of others.
@@ -110,10 +140,16 @@ export class DrawingSurface {
         // draw a box around the outside of the canvas.
         offscreen.strokeStyle = "white";
         offscreen.lineWidth = 5;
+        offscreen.strokeRect(
+            0,
+            0,
+            offscreen.canvas.width,
+            offscreen.canvas.height
+        );
 
         // Execute everything using this offscreen context
         for (const op of this.#drawOps) {
-            this.execute(op, offscreen);
+            await this.execute(op, offscreen);
         }
 
         // now draw the new pixels to the primary context.
