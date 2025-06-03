@@ -1,5 +1,5 @@
 import { DrawingSurface } from "./drawingSurface";
-import { ResizePolicy, ResizePolicyMap, ResizeFunction, Size } from "./types";
+import { ResizeFunction, ResizePolicy, ResizePolicyMap, Size } from "./types";
 
 /**
  * Gets a canvas element by its ID.
@@ -189,10 +189,11 @@ export class Melete<T = void> {
         this.#tick++;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.surfaces.forEach((surf) => {
-            // surf.redraw();
-            surf.render(ctx);
-            // surf.plan();
-            // surf.animate();
+            surf.render(ctx, this.#tick);
         });
+    }
+
+    animate() {
+        setInterval(() => this.draw(), 1000);
     }
 }

@@ -3,8 +3,8 @@ import { drawLine } from "./draw/line";
 import { drawSaveImage } from "./draw/saveImage";
 import { drawTurtles } from "./draw/turtles"; // Added drawTurtleCursor import
 import { identityMatrix } from "./matrix";
-import { debugImageCache } from "./tools/debugImageCache";
 import {
+    DrawFn,
     DrawOp,
     Matrix,
     NamedLocation,
@@ -19,7 +19,7 @@ import {
  */
 export class DrawingSurface {
     // drawing data
-    #drawOps: Array<DrawOp> = [];
+    #drawOps: Array<DrawOp | DrawFn> = [];
     #xfm: Matrix = identityMatrix();
     #namedLocations: Record<string, NamedLocation> = {};
     #namedImages: Map<string, ImageData> = new Map();
@@ -30,25 +30,35 @@ export class DrawingSurface {
         return { ...this.#xfm };
     }
 
+    get namedLocations(): Readonly<Record<string, NamedLocation>> {
+        return this.#namedLocations;
+    }
+
     setPen(penOp: PenOp): void {
         this.#drawOps.push({ pen: penOp });
     }
 
     cacheImageBuffer(name: string, imageBuffer: ImageData) {
         this.#namedImages.set(name, imageBuffer);
-        debugImageCache(this.#namedImages);
     }
 
-    async draw(spec: DrawOp): Promise<Record<string, NamedLocation>> {
+    async draw(spec: DrawOp | DrawFn): Promise<Record<string, NamedLocation>> {
         this.#drawOps.push(spec);
-        return await this.execute(spec);
+        return await this.execute(spec); // why is this needed here? seems nothing will run anyway with a null ctx
     }
 
     private async execute(
-        spec: DrawOp,
+        opOrFunction: DrawOp | DrawFn,
+        tick?: number,
         ctx?: RenderContext
     ): Promise<Record<string, NamedLocation>> {
         const namedLocations = this.#namedLocations;
+        let spec: DrawOp;
+        if (typeof opOrFunction === "function") {
+            spec = opOrFunction(tick ?? 0);
+        } else {
+            spec = opOrFunction;
+        }
         if (ctx && spec.pen) {
             if (spec.pen.stroke != null) {
                 ctx.strokeStyle = spec.pen.stroke;
@@ -60,12 +70,11 @@ export class DrawingSurface {
                 ctx.fillStyle = spec.pen.fill || "transparent";
             }
         } else if (ctx && spec.line) {
-            drawLine({ surf: this, ctx, namedLocations, geom: spec.line });
+            drawLine({ surf: this, ctx, geom: spec.line });
         } else if (ctx && spec.turtles) {
             drawTurtles({
                 surf: this,
                 ctx,
-                namedLocations,
                 geom: spec.turtles,
             });
         } else if (ctx && spec.saveImage) {
@@ -73,14 +82,12 @@ export class DrawingSurface {
                 ctx,
                 geom: spec.saveImage,
                 surf: this,
-                namedLocations,
             });
         } else if (ctx && spec.image) {
             await drawImage({
                 ctx,
                 geom: spec.image,
                 surf: this,
-                namedLocations,
             });
         } else if (ctx) {
             console.warn(
@@ -128,7 +135,7 @@ export class DrawingSurface {
      * This is the DrawingSurface method that is used to push pixels to an actual
      * canvas drawing context.
      */
-    async render(ctx: CanvasRenderingContext2D) {
+    async render(ctx: CanvasRenderingContext2D, tick: number) {
         const canvas = ctx.canvas;
 
         // make an offscreen buffer to draw onto that is independent of others.
@@ -149,11 +156,12 @@ export class DrawingSurface {
 
         // Execute everything using this offscreen context
         for (const op of this.#drawOps) {
-            await this.execute(op, offscreen);
+            await this.execute(op, tick, offscreen);
         }
 
         // now draw the new pixels to the primary context.
         const bitmap = offscreen.canvas.transferToImageBitmap();
         ctx.drawImage(bitmap, 0, 0);
+        bitmap.close();
     }
 }

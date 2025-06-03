@@ -19,7 +19,6 @@ import {
 export const drawTurtles = ({
     surf,
     ctx,
-    namedLocations,
     geom: turtles,
 }: RenderSupport<TurtleSequenceOp>) => {
     // Initialize a matrix for tracking turtle state
@@ -28,7 +27,7 @@ export const drawTurtles = ({
 
     turtles.forEach((turtleOp) => {
         if (turtleOp.op === "name" && turtleOp.name) {
-            handleNameOperation(turtleXfm, turtleOp.name, namedLocations);
+            handleNameOperation(turtleXfm, turtleOp.name, surf.namedLocations);
         } else if (turtleOp.op === "move") {
             turtleXfm = handleMoveOperation({
                 turtleXfm,
@@ -41,7 +40,7 @@ export const drawTurtles = ({
         } else if (turtleOp.op === "penState") {
             penDown = handlePenStateOperation(turtleOp.penState);
         } else if (turtleOp.op === "face") {
-            const spot = namedLocations[turtleOp.face];
+            const spot = surf.namedLocations[turtleOp.face];
             if (spot) {
                 // Calculate a rotation matrix to face the named location
                 const currentPos = currentPosition(turtleXfm);

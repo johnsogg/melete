@@ -9,7 +9,6 @@ export type RenderContext =
 export type RenderSupport<T> = {
     surf: DrawingSurface;
     ctx?: RenderContext;
-    namedLocations: Record<string, NamedLocation>;
     geom: T;
 };
 
@@ -92,6 +91,8 @@ export type DrawOp = {
     image?: ImageBufferOp;
     saveImage?: SaveImageBufferOp;
 };
+
+export type DrawFn = (tick: number) => DrawOp;
 
 export type RotationSpec = {
     radians?: number;

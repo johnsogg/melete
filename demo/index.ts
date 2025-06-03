@@ -11,6 +11,7 @@ const config = {
     lineAsterisk: true,
     namedLocationsTest: true,
     imageBufferTest: true,
+    animationTest: true,
 };
 
 const melete = new Melete({
@@ -145,4 +146,17 @@ if (config.imageBufferTest) {
     }
 }
 
-melete.draw();
+if (config.animationTest) {
+    bg.draw((tick) => {
+        console.log("Rendering animation test tick", tick);
+        return {
+            line: {
+                from: { x: tick % 200, y: tick % 200 },
+                to: { x: 100, y: 100 },
+            },
+        };
+    });
+}
+
+// melete.draw();
+melete.animate();

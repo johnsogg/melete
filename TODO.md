@@ -27,6 +27,7 @@ could add it.
         - ✅ When called for, be able to draw that image buffer
     - [ ] Animation
         - [ ] Should be able to animate individual drawing surfaces:
-            - [ ] At a fixed rate (e.g. 60 hertz)
-        - [ ] Have each animation schedule the next round, capped at some amount like 60 hertz.
-            - [ ]
+            - ✅ At a fixed rate (e.g. 60 hertz)
+            - [ ] If a surface doesn't require animation it should:
+                - [ ] Save its pixels when it finishes drawing
+                - [ ] Draw those pixels next time
