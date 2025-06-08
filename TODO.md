@@ -25,9 +25,9 @@ could add it.
         - ✅ Be able to store an offscreen buffer to an image by name
         - ✅ Have a way of knowing to use an offscreen image buffer
         - ✅ When called for, be able to draw that image buffer
-    - [ ] Animation
-        - [ ] Should be able to animate individual drawing surfaces:
+    - ✅ Animation
+        - ✅ Should be able to animate individual drawing surfaces:
             - ✅ At a fixed rate (e.g. 60 hertz)
-            - [ ] If a surface doesn't require animation it should:
-                - [ ] Save its pixels when it finishes drawing
-                - [ ] Draw those pixels next time
+            - ✅ If a surface doesn't require animation it should:
+                - ✅ Save its pixels when it finishes drawing
+                - ✅ Draw those pixels next time

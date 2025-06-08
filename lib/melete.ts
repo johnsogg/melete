@@ -1,4 +1,5 @@
 import { DrawingSurface } from "./drawingSurface";
+import { RollingStatistics } from "./tools/rollingStatistics";
 import { ResizeFunction, ResizePolicy, ResizePolicyMap, Size } from "./types";
 
 /**
@@ -59,6 +60,8 @@ export class Melete<T = void> {
 
     #tick: number = 0;
     #previousTick: number = 0;
+
+    #frameStats: RollingStatistics = new RollingStatistics(60);
 
     /**
      * Creates a new Melete instance.
@@ -166,12 +169,12 @@ export class Melete<T = void> {
      * @param name The name of the new layer.
      * @returns The new drawing surface.
      */
-    createLayer(name: string): DrawingSurface {
+    createLayer(name: string, animated: boolean = false): DrawingSurface {
         const existing = this.surfaces.find((s) => s.name === name);
         if (existing) {
             console.warn(`Creating another layer named "${name}"`);
         }
-        const surf = new DrawingSurface(name);
+        const surf = new DrawingSurface(name, animated);
         this.surfaces.push(surf);
         return surf;
     }
@@ -180,7 +183,7 @@ export class Melete<T = void> {
      * Draws all surfaces to the canvas.
      */
     draw() {
-        // draw all surfaces in the order they appear in the array
+        const startTime = performance.now();
         const canvas = this.getCanvas();
         const ctx = canvas.getContext("2d");
         if (!ctx) {
@@ -191,9 +194,14 @@ export class Melete<T = void> {
         this.surfaces.forEach((surf) => {
             surf.render(ctx, this.#tick);
         });
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        if (this.#frameStats != null) {
+            this.#frameStats.addValue(duration);
+        }
     }
 
     animate() {
-        setInterval(() => this.draw(), 1000);
+        setInterval(() => this.draw(), 16);
     }
 }

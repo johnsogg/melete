@@ -3,6 +3,7 @@ import { drawLine } from "./draw/line";
 import { drawSaveImage } from "./draw/saveImage";
 import { drawTurtles } from "./draw/turtles"; // Added drawTurtleCursor import
 import { identityMatrix } from "./matrix";
+import { drawCanvasBox } from "./tools/drawCanvasBox";
 import {
     DrawFn,
     DrawOp,
@@ -23,8 +24,12 @@ export class DrawingSurface {
     #xfm: Matrix = identityMatrix();
     #namedLocations: Record<string, NamedLocation> = {};
     #namedImages: Map<string, ImageData> = new Map();
+    #offbuffer?: ImageData;
 
-    public constructor(public readonly name: string) {}
+    public constructor(
+        public readonly name: string,
+        public readonly animated: boolean = false
+    ) {}
 
     get xfm(): Readonly<Matrix> {
         return { ...this.#xfm };
@@ -136,32 +141,37 @@ export class DrawingSurface {
      * canvas drawing context.
      */
     async render(ctx: CanvasRenderingContext2D, tick: number) {
-        const canvas = ctx.canvas;
+        const needToDraw = this.animated || this.#offbuffer == null;
+        if (needToDraw) {
+            const canvas = ctx.canvas;
 
-        // make an offscreen buffer to draw onto that is independent of others.
-        const offscreen = new OffscreenCanvas(
-            canvas.width,
-            canvas.height
-        ).getContext("2d") as OffscreenCanvasRenderingContext2D;
+            // make an offscreen buffer to draw onto that is independent of others.
+            const offscreen = new OffscreenCanvas(
+                canvas.width,
+                canvas.height
+            ).getContext("2d", {
+                willReadFrequently: true,
+            }) as OffscreenCanvasRenderingContext2D;
 
-        // draw a box around the outside of the canvas.
-        offscreen.strokeStyle = "white";
-        offscreen.lineWidth = 5;
-        offscreen.strokeRect(
-            0,
-            0,
-            offscreen.canvas.width,
-            offscreen.canvas.height
-        );
+            drawCanvasBox(offscreen);
 
-        // Execute everything using this offscreen context
-        for (const op of this.#drawOps) {
-            await this.execute(op, tick, offscreen);
+            // Execute everything using this offscreen context
+            for (const op of this.#drawOps) {
+                await this.execute(op, tick, offscreen);
+            }
+
+            // Important: retain pixel data before calling transferToImageBitmap
+            // because doing so invalidates the pixel data.
+            this.#offbuffer = offscreen.canvas
+                .getContext("2d")
+                ?.getImageData(0, 0, canvas.width, canvas.height);
+
+            // now draw the new pixels to the primary context.
+            const bitmap = offscreen.canvas.transferToImageBitmap();
+            ctx.drawImage(bitmap, 0, 0);
+            bitmap.close();
+        } else if (this.#offbuffer) {
+            ctx.putImageData(this.#offbuffer, 0, 0);
         }
-
-        // now draw the new pixels to the primary context.
-        const bitmap = offscreen.canvas.transferToImageBitmap();
-        ctx.drawImage(bitmap, 0, 0);
-        bitmap.close();
     }
 }
