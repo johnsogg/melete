@@ -1,22 +1,19 @@
 import { DrawingSurface } from "./drawingSurface";
 import { RollingStatistics } from "./tools/rollingStatistics";
-import { ResizeFunction, ResizePolicy, ResizePolicyMap, Size } from "./types";
+import {
+    AllEventHandlers,
+    MouseEventHandler,
+    ResizeFunction,
+    ResizePolicy,
+    ResizePolicyMap,
+    Size,
+} from "./types";
 
-/**
- * Gets a canvas element by its ID.
- * @param canvasId The ID of the canvas element.
- * @returns The canvas element.
- */
 const _getCanvas = (canvasId: string) => {
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     return canvas;
 };
 
-/**
- * Resize function that sets the canvas size to the full window dimensions.
- * @param canvas The canvas element to resize.
- * @returns The new size of the canvas.
- */
 const _resizeFullScreen: ResizeFunction = (canvas: HTMLCanvasElement) => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -26,11 +23,6 @@ const _resizeFullScreen: ResizeFunction = (canvas: HTMLCanvasElement) => {
     };
 };
 
-/**
- * Resize function that sets the canvas size to match its offset dimensions.
- * @param canvas The canvas element to resize.
- * @returns The new size of the canvas.
- */
 const _resizeCanvasOffset: ResizeFunction = (canvas: HTMLCanvasElement) => {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
@@ -40,9 +32,6 @@ const _resizeCanvasOffset: ResizeFunction = (canvas: HTMLCanvasElement) => {
     };
 };
 
-/**
- * Map of resize policy names to resize functions.
- */
 const _resizePolicies: ResizePolicyMap = {
     fullscreen: _resizeFullScreen,
     static: _resizeCanvasOffset,
@@ -60,13 +49,14 @@ export class Melete<T = void> {
 
     #tick: number = 0;
     #previousTick: number = 0;
+    #eventListenersAttached: boolean = false; // Added flag
 
     #frameStats: RollingStatistics = new RollingStatistics(60);
 
-    /**
-     * Creates a new Melete instance.
-     * @param options The options for creating the Melete instance.
-     */
+    #eventHandlers: AllEventHandlers = {
+        mouseClick: [],
+    };
+
     constructor({
         domId,
         userModel,
@@ -92,12 +82,11 @@ export class Melete<T = void> {
         this.canvasSize = { width: initialWidth, height: initialHeight };
         // establish the HTML canvas element
         document.querySelector<HTMLDivElement>(`#${domId}`)!.innerHTML = `
-    <canvas 
-      id="${this.canvasId}" 
-      width="${initialWidth}" 
-      height="${initialHeight}" 
-      tabindex="0"></canvas>
-  `;
+            <canvas 
+            id="${this.canvasId}" 
+            width="${initialWidth}" 
+            height="${initialHeight}" 
+            tabindex="0"></canvas>`;
 
         // when the window is resized, we might need to react
         const resize = () => {
@@ -115,27 +104,41 @@ export class Melete<T = void> {
 
         window.addEventListener("load", resize);
         window.addEventListener("resize", resize);
+
+        const canvas = _getCanvas(this.canvasId);
+        if (!canvas) {
+            console.error("Unable to find canvas in constructor");
+            return;
+        }
+
+        canvas.addEventListener("click", (event: MouseEvent) => {
+            const rect = canvas.getBoundingClientRect();
+            const meleteEvent = {
+                altKey: event.altKey,
+                ctrlKey: event.ctrlKey,
+                metaKey: event.metaKey,
+                shiftKey: event.shiftKey,
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top,
+                dx: event.movementX,
+                dy: event.movementY,
+                time: event.timeStamp,
+                button: event.button,
+            };
+            this.#eventHandlers.mouseClick.forEach((handler) => {
+                handler(meleteEvent);
+            });
+        });
     }
 
-    /**
-     * Gets the current tick value.
-     */
     get tick() {
         return this.#tick;
     }
 
-    /**
-     * Gets the previous tick value.
-     */
     get previousTick() {
         return this.#previousTick;
     }
 
-    /**
-     * Gets the canvas element.
-     * @returns The canvas element.
-     * @throws An error if the canvas element is not found.
-     */
     protected getCanvas(): HTMLCanvasElement {
         const canvas = _getCanvas(this.canvasId);
 
@@ -151,10 +154,6 @@ export class Melete<T = void> {
         return canvas;
     }
 
-    /**
-     * Gets the default drawing layer.
-     * @returns The default drawing surface.
-     */
     getDefaultLayer(): DrawingSurface {
         let def = this.surfaces.find((s) => s.name === "default");
         if (!def) {
@@ -164,11 +163,6 @@ export class Melete<T = void> {
         return def;
     }
 
-    /**
-     * Creates a new drawing layer with the given name.
-     * @param name The name of the new layer.
-     * @returns The new drawing surface.
-     */
     createLayer(name: string, animated: boolean = false): DrawingSurface {
         const existing = this.surfaces.find((s) => s.name === name);
         if (existing) {
@@ -179,9 +173,6 @@ export class Melete<T = void> {
         return surf;
     }
 
-    /**
-     * Draws all surfaces to the canvas.
-     */
     draw() {
         const startTime = performance.now();
         const canvas = this.getCanvas();
@@ -203,5 +194,9 @@ export class Melete<T = void> {
 
     animate() {
         setInterval(() => this.draw(), 16);
+    }
+
+    addMouseClickHandler(handler: MouseEventHandler) {
+        this.#eventHandlers.mouseClick.push(handler);
     }
 }

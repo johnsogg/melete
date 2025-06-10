@@ -3,6 +3,8 @@
 
 import "./style.css";
 
+import { debugMouseEvent } from "~/tools/debugMouseEvent";
+
 import { Melete } from "../lib"; // Adjusted import path
 
 const config = {
@@ -13,6 +15,7 @@ const config = {
     imageBufferTest: true,
     animationTest: true,
     layerTest: true,
+    mouseClickTest: true,
 };
 
 const melete = new Melete({
@@ -172,6 +175,10 @@ if (config.layerTest) {
             },
         };
     });
+}
+
+if (config.mouseClickTest) {
+    melete.addMouseClickHandler((ev) => console.log(debugMouseEvent(ev)));
 }
 
 melete.animate();

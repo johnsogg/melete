@@ -22,7 +22,6 @@ export type {
     RotationSpec,
     CameraSpec,
     NamedLocation,
-    EventHandlers,
     Matrix,
 } from "./types";
 

@@ -110,10 +110,30 @@ export type NamedLocation = {
     direction: Dir;
 };
 
-export type EventHandlers = {
-    mouseDown?: (pt: Pt) => void;
-    mouseDragged?: (pt: Pt) => void;
-    keyPressed?: (k: Key) => void;
+export type MeleteMouseEvent = {
+    time: number;
+    x: number;
+    y: number;
+    dx: number;
+    dy: number;
+    shiftKey: boolean;
+    ctrlKey: boolean;
+    altKey: boolean;
+    metaKey: boolean;
+    button: number;
+    /*
+        0: Main button, usually the left button or the un-initialized state
+        1: Auxiliary button, usually the wheel button or the middle button (if present)
+        2: Secondary button, usually the right button
+        3: Fourth button, typically the Browser Back button
+        4: Fifth button, typically the Browser Forward button
+    */
+};
+
+export type MouseEventHandler = (ev: MeleteMouseEvent) => void;
+
+export type AllEventHandlers = {
+    mouseClick: Array<MouseEventHandler>;
 };
 
 /**
