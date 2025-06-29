@@ -1,8 +1,0 @@
-{
-    "extends": "./tsconfig-base.json",
-    "compilerOptions": {
-        /* Sourcemaps for debugging support */
-        "sourceMap": true
-    },
-    "include": ["demo", "lib"]
-}
