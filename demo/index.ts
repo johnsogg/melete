@@ -16,6 +16,7 @@ const config = {
     animationTest: true,
     layerTest: true,
     mouseClickTest: true,
+    mouseClickRespondTest: true,
 };
 
 const melete = new Melete({
@@ -179,6 +180,23 @@ if (config.layerTest) {
 
 if (config.mouseClickTest) {
     melete.addMouseClickHandler((ev) => console.log(debugMouseEvent(ev)));
+}
+
+if (config.mouseClickRespondTest) {
+    melete.addMouseClickHandler((ev) => {
+        console.log(`Got mouse click at ${ev.x}, ${ev.y}`);
+        bg.draw({
+            pen: {
+                stroke: "red",
+                thickness: 2,
+            },
+            line: {
+                // from 0,0 to mouse click location
+                from: { x: 0, y: 0 },
+                to: { x: ev.x, y: ev.y },
+            },
+        });
+    });
 }
 
 melete.animate();

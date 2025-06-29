@@ -193,7 +193,7 @@ export class Melete<T = void> {
     }
 
     animate() {
-        setInterval(() => this.draw(), 16);
+        setInterval(() => this.draw(), 33);
     }
 
     addMouseClickHandler(handler: MouseEventHandler) {

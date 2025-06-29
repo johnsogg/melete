@@ -25,6 +25,7 @@ export class DrawingSurface {
     #namedLocations: Record<string, NamedLocation> = {};
     #namedImages: Map<string, ImageData> = new Map();
     #offbuffer?: ImageData;
+    #isDirty: boolean = false;
 
     public constructor(
         public readonly name: string,
@@ -41,6 +42,7 @@ export class DrawingSurface {
 
     setPen(penOp: PenOp): void {
         this.#drawOps.push({ pen: penOp });
+        this.markDirty();
     }
 
     cacheImageBuffer(name: string, imageBuffer: ImageData) {
@@ -49,6 +51,7 @@ export class DrawingSurface {
 
     async draw(spec: DrawOp | DrawFn): Promise<Record<string, NamedLocation>> {
         this.#drawOps.push(spec);
+        this.markDirty();
         return await this.execute(spec); // why is this needed here? seems nothing will run anyway with a null ctx
     }
 
@@ -104,6 +107,14 @@ export class DrawingSurface {
         return namedLocations;
     }
 
+    private markDirty(): void {
+        this.#isDirty = true;
+    }
+
+    private invalidateBuffer(): void {
+        this.#offbuffer = undefined;
+    }
+
     saveImageBuffer({
         name,
         topLeft,
@@ -141,7 +152,8 @@ export class DrawingSurface {
      * canvas drawing context.
      */
     async render(ctx: CanvasRenderingContext2D, tick: number) {
-        const needToDraw = this.animated || this.#offbuffer == null;
+        const needToDraw =
+            this.animated || this.#offbuffer == null || this.#isDirty;
         if (needToDraw) {
             const canvas = ctx.canvas;
 
@@ -170,6 +182,11 @@ export class DrawingSurface {
             const bitmap = offscreen.canvas.transferToImageBitmap();
             ctx.drawImage(bitmap, 0, 0);
             bitmap.close();
+
+            // Only invalidate after successful render
+            this.invalidateBuffer();
+            // Reset the dirty flag after successful render
+            this.#isDirty = false;
         } else if (this.#offbuffer) {
             ctx.putImageData(this.#offbuffer, 0, 0);
         }
