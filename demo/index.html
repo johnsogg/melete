@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Melete Demo Index</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+      
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: 'Lato', sans-serif;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .demo-list {
+        list-style: none;
+        padding: 0;
+      }
+      .demo-item {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        margin: 16px 0;
+        padding: 20px;
+        transition: box-shadow 0.2s ease;
+      }
+      .demo-item:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .demo-link {
+        text-decoration: none;
+        color: #2c3e50;
+        display: block;
+      }
+      .demo-title {
+        margin: 0 0 8px 0;
+        color: #2980b9;
+        font-size: 1.3em;
+      }
+      .demo-description {
+        margin: 0;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Melete Graphics Library Demos</h1>
+      <p>
+        Welcome to the Melete graphics library demo collection. Each demo showcases 
+        different features and capabilities of the library for creating web-based 
+        visual content.
+      </p>
+
+      <ul class="demo-list">
+        <li class="demo-item">
+          <a href="./hello-world/index.html" class="demo-link">
+            <h2 class="demo-title">Hello World</h2>
+            <p class="demo-description">
+              A basic introduction to the Melete library featuring simple shapes, 
+              colors, and text rendering on a canvas.
+            </p>
+          </a>
+        </li>
+      </ul>
+
+      <p>
+        <em>More demos will be added as the library develops...</em>
+      </p>
+    </div>
+  </body>
+</html>

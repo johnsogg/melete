@@ -45,3 +45,8 @@ npm run test
 ## Project Status
 
 This is a fresh start - the project was recently reset while preserving git history. All implementation details will be developed collaboratively from scratch, though the core vision and tech stack remain consistent with the original concept.
+
+## Memories
+
+- Refer to PLANNING.md for long term thinking
+- Refer to TODO.md for checklists of current feature ideas, bugs, and tooling fixes

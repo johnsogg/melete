@@ -1,0 +1,49 @@
+{
+  "name": "@johnsogg/melete",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A TypeScript graphics library for creating web-based visual content including procedurally generated art and educational visualizations",
+  "author": "Gabe Johnson",
+  "license": "MIT",
+  "keywords": ["graphics", "canvas", "turtle-graphics", "procedural-art", "visualization", "typescript"],
+  "homepage": "https://github.com/johnsogg/melete",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/johnsogg/melete.git"
+  },
+  "main": "./dist/melete.umd.js",
+  "module": "./dist/melete.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/melete.es.js",
+      "require": "./dist/melete.umd.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint lib/**/*.ts demo/**/*.ts",
+    "lint:fix": "eslint --fix lib/**/*.ts demo/**/*.ts",
+    "format": "prettier --write lib/**/*.ts demo/**/*.ts",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.2.0"
+  }
+}

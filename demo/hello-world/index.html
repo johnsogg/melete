@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello World - Melete Demo</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+      
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: 'Lato', sans-serif;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      canvas {
+        border: 1px solid #ccc;
+        display: block;
+        margin: 20px 0;
+      }
+      #canvas-container {
+        display: flex;
+        justify-content: center;
+      }
+      .demo-section {
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Hello World Graphics Demo</h1>
+      
+      <div class="demo-section">
+        <p>
+          This is the first demo of the Melete graphics library. It demonstrates the new 
+          DrawingSurface architecture with layer-based rendering and model-driven graphics.
+          Click the canvas to toggle the circle on and off!
+        </p>
+        <p>
+          This demo showcases:
+        </p>
+        <ul>
+          <li>DrawingSurface with layer schema pattern</li>
+          <li>Model-driven rendering with reactive updates</li>
+          <li>Layer-based drawing with onDemand callbacks</li>
+          <li>Mouse event handling with simplified event objects</li>
+          <li>Integration with existing drawing functions</li>
+        </ul>
+      </div>
+
+      <div id="canvas-container"></div>
+
+      <div class="demo-section">
+        <p>
+          The Melete library aims to make graphics programming accessible while maintaining 
+          flexibility for complex visualizations. This simple example demonstrates the 
+          library's straightforward API for creating visual content programmatically.
+        </p>
+        <p>
+          <a href="../index.html">← Back to Demo Index</a>
+        </p>
+      </div>
+    </div>
+
+    <script type="module" src="./index.ts"></script>
+  </body>
+</html>
