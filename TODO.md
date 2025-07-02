@@ -1,5 +1,18 @@
 # TODOs - keep this clean
 
+- [x] Update remaining hello-world drawing operations with draw functions
+  - The demo/hello-world/index.ts file has a few outstanding usages of the
+    canvas API. Let's write abstractions for those:
+  - [x] `clear` with some background color
+  - [x] Replace `setFillColor` and `setFont` and any other future persistent
+        style changes with `setStyle` that accepts a DrawingStyle implementation.
+        Any defined properties on that object should set the value. Any `null`
+        values should clear the value to whatever the default is.
+  - [x] replace `fillText` with `drawText` (the 'fill' vs 'draw' has always
+        bothered me - I understand the difference between filling and stroking but
+        this confuses students)
+  - [x] `drawLine` takes `from: Pt` and `to: Pt`
+
 - [x] Drawing routines like drawRect and drawCircle (and those that follow) will
       eventually be able to use complex styling information that is independent
       of the geometric specification.
@@ -49,3 +62,15 @@
 - Added support for both fill and stroke operations simultaneously
 - Updated demo to showcase stroke styling, thickness, and combined fill+stroke rendering
 - Demonstrates TypeScript intersection types working seamlessly for API design
+
+**2024-07-02: Complete Semantic Drawing API Implementation**
+
+- Extended `DrawingStyle` interface with text styling properties: `font` and `textColor`
+- Added `DrawTextParams` and `DrawLineParams` interfaces for semantic method parameters
+- Implemented `layer.clear(color?)` method for background clearing with optional color
+- Implemented `layer.setStyle(DrawingStyle)` for persistent styling state management
+- Implemented `layer.drawText()` with intersection type: `DrawTextParams & DrawingStyle`
+- Implemented `layer.drawLine()` with intersection type: `DrawLineParams & DrawingStyle`
+- Updated hello-world demo to use complete semantic API, eliminating all raw Canvas calls
+- Achieved educational goal: "drawText" vs "fillText" less confusing for students
+- Completed transformation from Canvas wrapper to full semantic graphics API

@@ -1,4 +1,4 @@
-import { DrawingSurface, drawLine, drawPolygon } from '../../lib/index';
+import { DrawingSurface, drawPolygon } from '../../lib/index';
 
 // Define a simple model for our demo
 interface HelloWorldModel {
@@ -39,10 +39,8 @@ const surface = new DrawingSurface({
 const mainLayer = surface.getLayer('main');
 
 mainLayer.onDemand(({ model, layer }) => {
-  const canvas = layer.getCanvas();
-
-  // Clear with background color
-  canvas.clear(model.backgroundColor);
+  // Clear with background color using semantic API
+  layer.clear(model.backgroundColor);
 
   // Draw a colorful rectangle using intersection types (geometry & style)
   layer.drawRect({
@@ -74,22 +72,40 @@ mainLayer.onDemand(({ model, layer }) => {
     strokeThickness: 2,
   });
 
-  // Draw some text (still using canvas methods for text)
-  canvas.setFillColor('#2c3e50');
-  canvas.setFont('32px Arial, sans-serif');
-  canvas.fillText(model.title, 150, 250);
+  // Set persistent text styling
+  layer.setStyle({
+    font: '32px Arial, sans-serif',
+    textColor: '#2c3e50',
+  });
 
-  // Draw subtitle
-  canvas.setFont('18px Arial, sans-serif');
-  canvas.setFillColor('#7f8c8d');
-  canvas.fillText(model.subtitle, 150, 280);
+  // Draw main title using semantic text API
+  layer.drawText({
+    text: model.title,
+    position: { x: 150, y: 250 },
+  });
 
-  // Draw a line using the higher-level drawing functions
-  drawLine(canvas, { x: 50, y: 320 }, { x: 550, y: 320 }, '#34495e');
+  // Update style for subtitle and draw
+  layer.setStyle({
+    font: '18px Arial, sans-serif',
+    textColor: '#7f8c8d',
+  });
 
-  // Draw a triangle using polygon function
+  layer.drawText({
+    text: model.subtitle,
+    position: { x: 150, y: 280 },
+  });
+
+  // Draw a line using semantic line API
+  layer.drawLine({
+    from: { x: 50, y: 320 },
+    to: { x: 550, y: 320 },
+    stroke: true,
+    strokeColor: '#34495e',
+  });
+
+  // Draw a triangle using polygon function (keep this as-is for now)
   drawPolygon(
-    canvas,
+    layer.getCanvas(),
     [
       { x: 300, y: 50 },
       { x: 280, y: 20 },

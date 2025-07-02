@@ -61,6 +61,8 @@ export interface DrawingStyle {
   stroke?: boolean;
   strokeThickness?: number;
   strokeColor?: Color;
+  font?: Font;
+  textColor?: Color;
 }
 
 // Drawing method parameter interfaces - geometry only
@@ -72,6 +74,16 @@ export interface DrawRectParams {
 export interface DrawCircleParams {
   center: Pt;
   radius: number;
+}
+
+export interface DrawTextParams {
+  text: string;
+  position: Pt;
+}
+
+export interface DrawLineParams {
+  from: Pt;
+  to: Pt;
 }
 
 // Drawing surface configuration

@@ -6,6 +6,8 @@ import {
   LayerOnTickCallback,
   DrawRectParams,
   DrawCircleParams,
+  DrawTextParams,
+  DrawLineParams,
   DrawingStyle,
 } from './types';
 
@@ -15,6 +17,7 @@ export class DrawingLayer<T = any> {
   private onTickCallback?: LayerOnTickCallback<T>;
   private canvas: Canvas;
   private model: T;
+  private persistentStyle: DrawingStyle = {};
 
   constructor(_name: string, config: LayerConfig, canvas: Canvas, model: T) {
     this.config = { ...config };
@@ -136,5 +139,62 @@ export class DrawingLayer<T = any> {
       }
       ctx.stroke();
     }
+  }
+
+  // Clear canvas with optional background color
+  clear(color?: string): void {
+    const ctx = this.canvas.getContext();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    
+    if (color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
+  }
+
+  // Set persistent style properties
+  setStyle(style: DrawingStyle): void {
+    // Merge new style with persistent style
+    // null values should clear the property to default
+    Object.keys(style).forEach(key => {
+      const styleKey = key as keyof DrawingStyle;
+      const value = style[styleKey];
+      if (value === null || value === undefined) {
+        delete this.persistentStyle[styleKey];
+      } else {
+        (this.persistentStyle as any)[styleKey] = value;
+      }
+    });
+  }
+
+  // Draw text with semantic parameters
+  drawText(params: DrawTextParams & DrawingStyle): void {
+    const ctx = this.canvas.getContext();
+    
+    // Merge persistent style with local style
+    const mergedStyle = { ...this.persistentStyle, ...params };
+    
+    // Apply text styling
+    if (mergedStyle.font) {
+      ctx.font = mergedStyle.font;
+    }
+    if (mergedStyle.textColor) {
+      ctx.fillStyle = mergedStyle.textColor;
+    } else if (mergedStyle.color) {
+      ctx.fillStyle = mergedStyle.color;
+    }
+    
+    ctx.fillText(params.text, params.position.x, params.position.y);
+  }
+
+  // Draw line with semantic parameters
+  drawLine(params: DrawLineParams & DrawingStyle): void {
+    const ctx = this.canvas.getContext();
+    
+    // Apply styling and draw
+    this.applyStyleAndDraw(ctx, params, () => {
+      ctx.moveTo(params.from.x, params.from.y);
+      ctx.lineTo(params.to.x, params.to.y);
+    });
   }
 }
