@@ -1,4 +1,5 @@
 import { DrawingSurface, MeleteMouseEvent } from './surface';
+import { LayerSchema } from './types';
 
 interface DebugEvent {
   type: string;
@@ -19,8 +20,8 @@ export interface DebugPanelOptions {
   expandedByDefault?: boolean;
 }
 
-export class DebugPanel<T = any> {
-  private surface: DrawingSurface<T>;
+export class DebugPanel<T = any, S extends LayerSchema = LayerSchema> {
+  private surface: DrawingSurface<T, S>;
   private container: HTMLElement;
   private eventHistory: DebugEvent[] = [];
   private performanceData: PerformanceData = {
@@ -41,10 +42,11 @@ export class DebugPanel<T = any> {
   private eventHistoryElement!: HTMLElement;
   private performanceElement!: HTMLElement;
   private canvasInfoElement!: HTMLElement;
+  private layerControlsElement!: HTMLElement;
   private toggleButton!: HTMLElement;
 
   constructor(
-    surface: DrawingSurface<T>,
+    surface: DrawingSurface<T, S>,
     container: HTMLElement,
     options: DebugPanelOptions = {}
   ) {
@@ -96,6 +98,13 @@ export class DebugPanel<T = any> {
             <div>Layers: <span class="debug-layer-count">--</span></div>
           </div>
         </div>
+        
+        <div class="debug-section">
+          <h4>👁️ Layer Controls</h4>
+          <div class="debug-layer-controls">
+            Loading layer controls...
+          </div>
+        </div>
       </div>
     `;
 
@@ -112,6 +121,9 @@ export class DebugPanel<T = any> {
       this.panelElement.querySelector('.debug-performance')!;
     this.canvasInfoElement =
       this.panelElement.querySelector('.debug-canvas-info')!;
+    this.layerControlsElement = this.panelElement.querySelector(
+      '.debug-layer-controls'
+    )!;
     this.toggleButton = this.panelElement.querySelector('.debug-toggle')!;
 
     // Append to container
@@ -120,6 +132,7 @@ export class DebugPanel<T = any> {
     // Initial updates
     this.updateModelState();
     this.updateCanvasInfo();
+    this.updateLayerControls();
   }
 
   private addStyles(): void {
@@ -242,6 +255,53 @@ export class DebugPanel<T = any> {
       .debug-canvas-size, .debug-layer-count {
         font-weight: 600;
         color: #28a745;
+      }
+      
+      .debug-layer-controls {
+        background: #ffffff;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 8px;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+      
+      .layer-control {
+        margin-bottom: 6px;
+      }
+      
+      .layer-control:last-child {
+        margin-bottom: 0;
+      }
+      
+      .layer-control-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 13px;
+        gap: 6px;
+      }
+      
+      .layer-control-label:hover {
+        background-color: #f8f9fa;
+        border-radius: 3px;
+        padding: 2px 4px;
+      }
+      
+      .layer-visibility-checkbox {
+        margin: 0;
+        cursor: pointer;
+      }
+      
+      .layer-order {
+        color: #6c757d;
+        font-size: 12px;
+        min-width: 20px;
+      }
+      
+      .layer-name {
+        font-weight: 500;
+        color: #495057;
       }
     `;
     document.head.appendChild(style);
@@ -412,6 +472,51 @@ export class DebugPanel<T = any> {
     // Count layers by checking the layer schema
     const layerCount = Object.keys((this.surface as any).layerSchema).length;
     layerCountElement.textContent = layerCount.toString();
+  }
+
+  private updateLayerControls(): void {
+    const layerNames = this.surface.getLayerNames();
+
+    // Create checkbox controls for each layer
+    const controlsHtml = layerNames
+      .map((layerName, index) => {
+        const isVisible = this.surface.isLayerVisible(layerName);
+        const layerNameStr = String(layerName);
+
+        return `
+          <div class="layer-control">
+            <label class="layer-control-label">
+              <input 
+                type="checkbox" 
+                class="layer-visibility-checkbox" 
+                data-layer="${layerNameStr}"
+                ${isVisible ? 'checked' : ''}
+              />
+              <span class="layer-order">${index + 1}.</span>
+              <span class="layer-name">${layerNameStr}</span>
+            </label>
+          </div>
+        `;
+      })
+      .join('');
+
+    this.layerControlsElement.innerHTML = controlsHtml;
+
+    // Add event listeners to checkboxes
+    const checkboxes = this.layerControlsElement.querySelectorAll(
+      '.layer-visibility-checkbox'
+    );
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', event => {
+        const target = event.target as HTMLInputElement;
+        const layerName = target.dataset.layer!;
+        const isVisible = target.checked;
+
+        this.surface.setLayerVisible(layerName, isVisible);
+        this.surface.rerender();
+      });
+    });
   }
 
   destroy(): void {

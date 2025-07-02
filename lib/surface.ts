@@ -22,6 +22,7 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   private canvas: Canvas;
   private canvasElement: HTMLCanvasElement;
   private layers: Map<keyof S, DrawingLayer<T>> = new Map();
+  private layerVisibility: Map<keyof S, boolean> = new Map();
   private clickHandlers: MouseEventHandler[] = [];
 
   constructor(config: DrawingSurfaceConfig<T, S>) {
@@ -59,6 +60,8 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
         this.model
       );
       this.layers.set(layerName, layer);
+      // Initialize layer as visible by default
+      this.layerVisibility.set(layerName, true);
     }
   }
 
@@ -91,12 +94,14 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
     // Clear canvas
     this.canvas.clear();
 
-    // Render layers in schema order
+    // Render layers in schema order, but only if visible
     const layerNames = Object.keys(this.layerSchema) as (keyof S)[];
 
     for (const layerName of layerNames) {
       const layer = this.layers.get(layerName);
-      if (layer) {
+      const isVisible = this.layerVisibility.get(layerName) ?? true;
+
+      if (layer && isVisible) {
         layer.render(tick);
       }
     }
@@ -145,6 +150,21 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   // Get the underlying canvas for direct access if needed
   getCanvas(): Canvas {
     return this.canvas;
+  }
+
+  // Layer visibility control
+  setLayerVisible(layerName: keyof S, visible: boolean): void {
+    this.layerVisibility.set(layerName, visible);
+  }
+
+  // Get layer visibility state
+  isLayerVisible(layerName: keyof S): boolean {
+    return this.layerVisibility.get(layerName) ?? true;
+  }
+
+  // Get all layer names in render order
+  getLayerNames(): (keyof S)[] {
+    return Object.keys(this.layerSchema) as (keyof S)[];
   }
 
   // Clean up resources

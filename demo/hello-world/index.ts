@@ -14,6 +14,8 @@ const DEMO_LAYERS = {
   main: { cache: false, offscreen: false },
 } as const;
 
+type HelloWorldLayerSchema = typeof DEMO_LAYERS;
+
 // Create the model
 const model: HelloWorldModel = {
   title: 'Hello World!',
@@ -29,7 +31,7 @@ if (!container) {
 }
 
 // Create DrawingSurface with our model and layer schema
-const surface = new DrawingSurface({
+const surface = new DrawingSurface<HelloWorldModel, HelloWorldLayerSchema>({
   model,
   layerSchema: DEMO_LAYERS,
   canvasOptions: { width: 600, height: 400 },
@@ -146,9 +148,13 @@ if (debugContainer) {
   debugContainer.innerHTML = '';
 
   // Create the debug panel
-  new DebugPanel(surface, debugContainer, {
-    maxEventHistory: 15,
-    updateInterval: 200,
-    expandedByDefault: true,
-  });
+  new DebugPanel<HelloWorldModel, HelloWorldLayerSchema>(
+    surface,
+    debugContainer,
+    {
+      maxEventHistory: 15,
+      updateInterval: 200,
+      expandedByDefault: true,
+    }
+  );
 }
