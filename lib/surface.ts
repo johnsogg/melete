@@ -27,7 +27,6 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   private canvasElement: HTMLCanvasElement;
   private layers: Map<keyof S, DrawingLayer<T>> = new Map();
   private clickHandlers: MouseEventHandler[] = [];
-  private needsRerender = false;
 
   constructor(config: DrawingSurfaceConfig<T, S>) {
     this.model = config.model;
@@ -84,8 +83,6 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
     for (const layer of this.layers.values()) {
       layer.updateModel(newModel);
     }
-    
-    this.needsRerender = true;
   }
 
   // Get current model
@@ -107,19 +104,12 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
         layer.render(tick);
       }
     }
-
-    this.needsRerender = false;
   }
 
   // Request a rerender on next frame
   rerender(): void {
-    if (this.needsRerender) return; // Already scheduled
-    
-    this.needsRerender = true;
     requestAnimationFrame(() => {
-      if (this.needsRerender) {
-        this.render();
-      }
+      this.render();
     });
   }
 

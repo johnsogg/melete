@@ -76,6 +76,10 @@ export class Canvas {
   getContext(): CanvasRenderingContext2D {
     return this.ctx;
   }
+
+  getElement(): HTMLCanvasElement {
+    return this.canvas;
+  }
 }
 
 export function createCanvas(

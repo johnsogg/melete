@@ -1,5 +1,8 @@
 # TODOs - keep this clean
 
+- [x] Add click handler to drawing surface. In the hello-world demo have this
+      modify the model to toggle the circle.
+
 - [x] Update remaining hello-world drawing operations with draw functions
   - The demo/hello-world/index.ts file has a few outstanding usages of the
     canvas API. Let's write abstractions for those:
@@ -74,3 +77,14 @@
 - Updated hello-world demo to use complete semantic API, eliminating all raw Canvas calls
 - Achieved educational goal: "drawText" vs "fillText" less confusing for students
 - Completed transformation from Canvas wrapper to full semantic graphics API
+
+**2024-07-02: Click Handler Bug Fix and Debug System**
+
+- Debugged and fixed click handler not updating graphics despite model changes
+- Identified root cause: rerender() skip logic conflicting with rapid model updates
+- Fixed rerender() method to always schedule new animation frames for latest model state
+- Added comprehensive debug logging system to diagnose render pipeline issues
+- Added debug UI panel to hello-world demo showing click coordinates and model state
+- Added Canvas.getElement() method for accessing underlying HTMLCanvasElement
+- Verified click interaction works correctly: circle toggles on canvas clicks
+- Cleaned up all debug logging while preserving useful debug UI for demos
