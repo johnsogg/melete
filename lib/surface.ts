@@ -93,9 +93,21 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   setModel(newModel: T): void {
     this.model = newModel;
 
-    // Update model reference in all layers
+    // Update model reference in all layers (this will invalidate caches)
     for (const layer of this.layers.values()) {
       layer.updateModel(newModel);
+    }
+
+    // Trigger rerender if not in animation mode
+    if (!this.hasAnimatedLayers) {
+      this.rerender();
+    }
+  }
+
+  // Manually invalidate all layer caches
+  invalidateAllCaches(): void {
+    for (const layer of this.layers.values()) {
+      layer.invalidateCache();
     }
   }
 
@@ -210,6 +222,13 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   destroy(): void {
     // Stop animation
     this.stopAnimation();
+
+    // Destroy all layers
+    for (const layer of this.layers.values()) {
+      layer.destroy();
+    }
+    this.layers.clear();
+    this.layerVisibility.clear();
 
     // Remove canvas from DOM
     if (this.canvasElement.parentNode) {

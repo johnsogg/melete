@@ -103,7 +103,7 @@ function init() {
     // Draw twinkling stars
     model.stars.forEach(star => {
       // Calculate twinkling intensity using sine wave based on tick
-      const time = tick * 0.05; // Slow down the animation
+      const time = (tick ?? 0) * 0.05; // Slow down the animation
       const intensity = star.baseIntensity + Math.sin(time + star.phase) * 0.3;
 
       // Convert intensity to alpha for twinkling effect
@@ -165,7 +165,7 @@ function init() {
   asteroidsLayer.onTick(({ model, tick }) => {
     // Update asteroid positions using tick for circular motion
     model.asteroids.forEach(asteroid => {
-      const angle = tick * asteroid.orbitSpeed;
+      const angle = (tick ?? 0) * asteroid.orbitSpeed;
       asteroid.position.x =
         asteroid.centerX + Math.cos(angle) * asteroid.orbitRadius;
       asteroid.position.y =

@@ -17,12 +17,12 @@
         twinkle as a function of time, and the asteroids move around. No need
         to collision detect as that is not the point of the demo.
 
-- [ ] Support cached images for non-animated layers
-  - [ ] This should be done with an OffscreenCanvas so it does not affect any
+- [x] Support cached images for non-animated layers
+  - [x] This should be done with an OffscreenCanvas so it does not affect any
         other layer
-  - [ ] After completing drawing operations against the offscreen canvas, store
+  - [x] After completing drawing operations against the offscreen canvas, store
         an image using main memory - do not use GPU memory for this!
-  - [ ] On subsequent draws, draw the cached image instead of using the normal
+  - [x] On subsequent draws, draw the cached image instead of using the normal
         drawing routine.
 
 - [x] Create a new demo that focuses on layers. This will involve implementing new features:
