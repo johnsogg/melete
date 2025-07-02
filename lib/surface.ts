@@ -1,10 +1,6 @@
 import { Canvas, createCanvas } from './canvas';
 import { DrawingLayer } from './layer';
-import { 
-  DrawingSurfaceConfig, 
-  LayerSchema, 
-  CanvasOptions 
-} from './types';
+import { DrawingSurfaceConfig, LayerSchema, CanvasOptions } from './types';
 
 // Event handling types
 export interface MeleteMouseEvent {
@@ -40,9 +36,9 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
     // Set up canvas with options
     const canvasOptions: CanvasOptions = config.canvasOptions || {
       width: 800,
-      height: 600
+      height: 600,
     };
-    
+
     this.canvas = createCanvas(this.canvasElement, canvasOptions);
 
     // Create layers based on schema
@@ -53,7 +49,7 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
 
   private createLayers(): void {
     const layerNames = Object.keys(this.layerSchema) as (keyof S)[];
-    
+
     for (const layerName of layerNames) {
       const layerConfig = this.layerSchema[layerName];
       const layer = new DrawingLayer<T>(
@@ -78,7 +74,7 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   // Update the model and mark for rerender
   setModel(newModel: T): void {
     this.model = newModel;
-    
+
     // Update model reference in all layers
     for (const layer of this.layers.values()) {
       layer.updateModel(newModel);
@@ -97,7 +93,7 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
 
     // Render layers in schema order
     const layerNames = Object.keys(this.layerSchema) as (keyof S)[];
-    
+
     for (const layerName of layerNames) {
       const layer = this.layers.get(layerName);
       if (layer) {
@@ -125,7 +121,7 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
 
   private handleClick(rawEvent: MouseEvent): void {
     const meleteEvent = this.createMeleteMouseEvent(rawEvent);
-    
+
     for (const handler of this.clickHandlers) {
       handler(meleteEvent);
     }
@@ -133,7 +129,7 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
 
   private createMeleteMouseEvent(rawEvent: MouseEvent): MeleteMouseEvent {
     const rect = this.canvasElement.getBoundingClientRect();
-    
+
     return {
       canvasX: rawEvent.clientX - rect.left,
       canvasY: rawEvent.clientY - rect.top,
@@ -142,7 +138,7 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
       ctrlKey: rawEvent.ctrlKey,
       altKey: rawEvent.altKey,
       metaKey: rawEvent.metaKey,
-      rawEvent
+      rawEvent,
     };
   }
 

@@ -1,4 +1,5 @@
 import { DrawingSurface, drawPolygon } from '../../lib/index';
+import { DebugPanel } from '../../lib/debug';
 
 // Define a simple model for our demo
 interface HelloWorldModel {
@@ -120,27 +121,14 @@ mainLayer.onDemand(({ model, layer }) => {
 surface.onClick(event => {
   console.log('Canvas clicked at:', event.canvasX, event.canvasY);
 
-  // Update debug UI
-  const clickStatus = document.getElementById('click-status');
-  if (clickStatus) {
-    clickStatus.textContent = `Clicked at (${event.canvasX}, ${event.canvasY}) at ${new Date().toLocaleTimeString()}`;
-    clickStatus.style.color = 'green';
-  }
-
   // Toggle circle visibility
   const currentModel = surface.getModel();
   const newModel = {
     ...currentModel,
     showCircle: !currentModel.showCircle,
   };
-  
-  surface.setModel(newModel);
 
-  // Update model state debug info
-  const modelState = document.getElementById('model-state');
-  if (modelState) {
-    modelState.textContent = `Circle visible: ${newModel.showCircle}`;
-  }
+  surface.setModel(newModel);
 
   // Trigger rerender
   surface.rerender();
@@ -151,8 +139,16 @@ surface.rerender();
 
 console.log('Hello World demo initialized with DrawingSurface');
 
-// Initialize debug UI
-const modelState = document.getElementById('model-state');
-if (modelState) {
-  modelState.textContent = `Circle visible: ${model.showCircle}`;
+// Create debug panel
+const debugContainer = document.getElementById('debug-info');
+if (debugContainer) {
+  // Clear existing debug content
+  debugContainer.innerHTML = '';
+
+  // Create the debug panel
+  new DebugPanel(surface, debugContainer, {
+    maxEventHistory: 15,
+    updateInterval: 200,
+    expandedByDefault: true,
+  });
 }

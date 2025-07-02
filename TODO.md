@@ -1,90 +1,40 @@
 # TODOs - keep this clean
 
-- [x] Add click handler to drawing surface. In the hello-world demo have this
-      modify the model to toggle the circle.
+- [x] Debug widget. See our convo about it here:
 
-- [x] Update remaining hello-world drawing operations with draw functions
-  - The demo/hello-world/index.ts file has a few outstanding usages of the
-    canvas API. Let's write abstractions for those:
-  - [x] `clear` with some background color
-  - [x] Replace `setFillColor` and `setFont` and any other future persistent
-        style changes with `setStyle` that accepts a DrawingStyle implementation.
-        Any defined properties on that object should set the value. Any `null`
-        values should clear the value to whatever the default is.
-  - [x] replace `fillText` with `drawText` (the 'fill' vs 'draw' has always
-        bothered me - I understand the difference between filling and stroking but
-        this confuses students)
-  - [x] `drawLine` takes `from: Pt` and `to: Pt`
+> I love the debug information thing! I imagine that will become a thing on every demo page.
 
-- [x] Drawing routines like drawRect and drawCircle (and those that follow) will
-      eventually be able to use complex styling information that is independent
-      of the geometric specification.
-  - [x] Please make a separate `DrawingStyle` interface that describes these
-        things, such as `fill: boolean` and `color: Color`, and remove those
-        values from what is currently in the input argument interface.
-  - [x] You can also add `stroke: boolean`, `strokeThickness: number`,
-        `strokeColor: Color` - all the params should be optional, though.
-  - [x] Then allow drawing functions to take a union of the geometric items
-        (topLeft, size) and style info. The function signature could be such as
-        `drawRect(params: DrawRectParams & DrawingStyle)`
+⏺ That's a great idea! The debug information panel is really useful for demonstrating how the library works internally. It shows:
 
-- [x] Geometric primitive types can support 2D and 3D. Initially we only care about 2D.
-  - [x] `Pt` has x, y, and (optional) z numbers (please rework the Point type to be this)
-  - [x] `Vec` has dx, dy, and (optional) dz numbers
-  - [x] `Size`has same fields as Vec - only difference is the name, which is important
-- [x] Drawing command API should be about meaningfully named object arguments:
-  - [x] Since DrawingLayers are where drawing operations will be applied,
-        these should be part of that object's public interface.
-  - [x] `drawRect`
-    - [x] `topLeft: Pt` specifies the top left location
-    - [x] `size: Size` specifies the width/height
-    - [x] optional `fill: boolean` and `color: Color` parameters
-  - [x] `drawCircle`
-    - [x] `center: Pt` specifies the center location
-    - [x] `radius: number` specifies radius
-    - [x] optional `fill: boolean` and `color: Color` parameters
+- Click coordinates with timestamps - great for understanding event handling
+- Model state - shows how the data-driven rendering works
+- Visual feedback - makes it obvious when interactions are working
 
-## Completed Items
+This would be perfect to standardize across all demos. We could create a reusable debug panel component that shows:
 
-**2024-07-02: Semantic Drawing API Implementation**
+- Current model state (formatted nicely)
+- Recent events (clicks, key presses, etc.)
+- Performance info (render times, FPS)
+- Canvas state (dimensions, element info)
+- Layer information
 
-- Implemented `Pt` interface replacing `Point` with optional z coordinate
-- Added `Vec` interface for vectors with dx, dy, optional dz
-- Added `DrawRectParams` and `DrawCircleParams` interfaces
-- Implemented `drawRect()` and `drawCircle()` methods on DrawingLayer class
-- Updated hello-world demo to showcase new semantic API
-- Maintained backward compatibility with `Point` type alias
-- All drawing operations now use clear, object-based arguments instead of positional parameters
+It would help users understand:
 
-**2024-07-02: Styling System with Intersection Types**
+1. How model-driven rendering works - see the model change in real-time
+2. Event system - see exactly where clicks are registered
+3. Performance characteristics - understand rendering behavior
+4. Debugging their own code - template for adding debugging to their projects
 
-- Created `DrawingStyle` interface with comprehensive styling options (fill, stroke, colors, thickness)
-- Separated geometric parameters from styling parameters for better organization
-- Updated `drawRect()` and `drawCircle()` to use intersection types: `DrawRectParams & DrawingStyle`
-- Implemented helper method `applyStyleAndDraw()` for consistent styling across drawing methods
-- Added support for both fill and stroke operations simultaneously
-- Updated demo to showcase stroke styling, thickness, and combined fill+stroke rendering
-- Demonstrates TypeScript intersection types working seamlessly for API design
+Plus it makes the demos much more educational and interactive. When you're teaching graphics programming, being able to see the internal state makes everything
+clearer.
 
-**2024-07-02: Complete Semantic Drawing API Implementation**
+Would you like me to create a reusable debug panel component that could be easily added to future demos? It could be as simple as a function that creates the
+debug UI and hooks into the DrawingSurface events.
 
-- Extended `DrawingStyle` interface with text styling properties: `font` and `textColor`
-- Added `DrawTextParams` and `DrawLineParams` interfaces for semantic method parameters
-- Implemented `layer.clear(color?)` method for background clearing with optional color
-- Implemented `layer.setStyle(DrawingStyle)` for persistent styling state management
-- Implemented `layer.drawText()` with intersection type: `DrawTextParams & DrawingStyle`
-- Implemented `layer.drawLine()` with intersection type: `DrawLineParams & DrawingStyle`
-- Updated hello-world demo to use complete semantic API, eliminating all raw Canvas calls
-- Achieved educational goal: "drawText" vs "fillText" less confusing for students
-- Completed transformation from Canvas wrapper to full semantic graphics API
-
-**2024-07-02: Click Handler Bug Fix and Debug System**
-
-- Debugged and fixed click handler not updating graphics despite model changes
-- Identified root cause: rerender() skip logic conflicting with rapid model updates
-- Fixed rerender() method to always schedule new animation frames for latest model state
-- Added comprehensive debug logging system to diagnose render pipeline issues
-- Added debug UI panel to hello-world demo showing click coordinates and model state
-- Added Canvas.getElement() method for accessing underlying HTMLCanvasElement
-- Verified click interaction works correctly: circle toggles on canvas clicks
-- Cleaned up all debug logging while preserving useful debug UI for demos
+- [ ] Create a new demo that focuses on layers. This will involve implementing new features:
+  - [ ] DrawingSurface can be constructed with several named layers
+  - [ ] Each layer will have their own drawing routines in the demo:
+    - [ ] Background: empty space with some small dots for stars
+    - [ ] Space Ship: centered on screen, made from rectangle and circles. it can look dumb
+    - [ ] Asteroids: two large gray circles flanking the ship
+  - [ ] For now, each layer is static

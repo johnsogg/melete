@@ -11,3 +11,6 @@ export * from './canvas';
 export * from './drawing';
 export * from './layer';
 export * from './surface';
+
+// Debug utilities
+export * from './debug';

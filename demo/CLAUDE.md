@@ -13,8 +13,7 @@ This file provides guidance to Claude Code when working with demos in the Melete
 - Demos should showcase specific library features or use cases
 - Keep demos focused on one main concept or feature set
 - Include navigation back to the main demo index
-- Use consistent styling across all demos:
-  - Use the "Fanwood Text" font
+- Use consistent simple styling in all demos
 
 ## Current Demos
 
@@ -32,7 +31,6 @@ When adding new demos:
 
 ## Technical Notes
 
-- Demos import library code from `../../lib/index`
 - Canvas elements should have meaningful IDs
 - Use TypeScript for demo logic
 - Follow the established styling patterns for consistency

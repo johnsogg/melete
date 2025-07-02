@@ -145,7 +145,7 @@ export class DrawingLayer<T = any> {
   clear(color?: string): void {
     const ctx = this.canvas.getContext();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    
+
     if (color) {
       ctx.fillStyle = color;
       ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -170,10 +170,10 @@ export class DrawingLayer<T = any> {
   // Draw text with semantic parameters
   drawText(params: DrawTextParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
-    
+
     // Merge persistent style with local style
     const mergedStyle = { ...this.persistentStyle, ...params };
-    
+
     // Apply text styling
     if (mergedStyle.font) {
       ctx.font = mergedStyle.font;
@@ -183,14 +183,14 @@ export class DrawingLayer<T = any> {
     } else if (mergedStyle.color) {
       ctx.fillStyle = mergedStyle.color;
     }
-    
+
     ctx.fillText(params.text, params.position.x, params.position.y);
   }
 
   // Draw line with semantic parameters
   drawLine(params: DrawLineParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
-    
+
     // Apply styling and draw
     this.applyStyleAndDraw(ctx, params, () => {
       ctx.moveTo(params.from.x, params.from.y);

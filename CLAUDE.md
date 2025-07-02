@@ -50,3 +50,4 @@ This is a fresh start - the project was recently reset while preserving git hist
 
 - Refer to PLANNING.md for long term thinking
 - Refer to TODO.md for checklists of current feature ideas, bugs, and tooling fixes
+- Before finishing a task, execute `npm run lint:fix` to automatically fix formatting issues
