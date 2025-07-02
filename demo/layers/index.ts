@@ -92,9 +92,9 @@ function init() {
       topLeft: { x: ship.x - 20, y: ship.y - 10 },
       size: { width: 40, height: 20 },
       fill: true,
-      color: '#silver',
+      color: 'hsl(0, 0%, 75%)', // Silver
       stroke: true,
-      strokeColor: '#white',
+      strokeColor: 'hsl(0, 0%, 100%)', // White
       strokeThickness: 1,
     });
 
@@ -103,9 +103,9 @@ function init() {
       center: { x: ship.x, y: ship.y - 5 },
       radius: 8,
       fill: true,
-      color: '#lightblue',
+      color: 'hsl(200, 100%, 85%)', // Light blue
       stroke: true,
-      strokeColor: '#white',
+      strokeColor: 'hsl(0, 0%, 100%)', // White
       strokeThickness: 1,
     });
 
@@ -114,13 +114,13 @@ function init() {
       center: { x: ship.x - 25, y: ship.y },
       radius: 3,
       fill: true,
-      color: '#orange',
+      color: 'hsl(30, 100%, 50%)', // Orange
     });
     spaceshipLayer.drawCircle({
       center: { x: ship.x - 28, y: ship.y },
       radius: 2,
       fill: true,
-      color: '#red',
+      color: 'hsl(0, 100%, 50%)', // Red
     });
   });
 
@@ -132,9 +132,9 @@ function init() {
         center: asteroid,
         radius: 40,
         fill: true,
-        color: '#666666',
+        color: 'hsl(0, 0%, 40%)', // Dark gray
         stroke: true,
-        strokeColor: '#999999',
+        strokeColor: 'hsl(0, 0%, 60%)', // Medium gray
         strokeThickness: 2,
       });
     });

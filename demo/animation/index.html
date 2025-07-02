@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melete - Animation Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 600px;
+        }
+        canvas {
+            border: 1px solid #333;
+        }
+        .description {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Melete Animation Demo - Living Space Scene</h1>
+    <div class="description">
+        Watch the stars twinkle and asteroids drift through space!
+    </div>
+    <div id="canvas-container"></div>
+    <div id="debug-info"></div>
+    <script type="module" src="./index.ts"></script>
+</body>
+</html>

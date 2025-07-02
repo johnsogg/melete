@@ -36,6 +36,7 @@ export type Font = string;
 export interface LayerConfig {
   cache: boolean;
   offscreen: boolean;
+  animated?: boolean;
 }
 
 export type LayerSchema = Record<string, LayerConfig>;
@@ -95,4 +96,5 @@ export interface DrawingSurfaceConfig<
   layerSchema: S;
   canvasOptions?: CanvasOptions;
   container?: HTMLElement;
+  animationRate?: number;
 }

@@ -51,25 +51,35 @@ export class DrawingLayer<T = any> {
 
   // Render this layer (called by DrawingSurface)
   render(tick?: number): void {
-    const context: LayerCallbackContext<T> = {
-      model: this.model,
-      tick,
-      layer: this,
-    };
+    const ctx = this.canvas.getContext();
 
-    // Clear canvas if this layer has offscreen buffer (future enhancement)
-    if (this.config.offscreen) {
-      // TODO: Implement offscreen canvas support
-    }
+    // Save canvas state to isolate layer styles
+    ctx.save();
 
-    // Call onTick callback if provided and tick is available
-    if (this.onTickCallback && tick !== undefined) {
-      this.onTickCallback(context);
-    }
+    try {
+      const context: LayerCallbackContext<T> = {
+        model: this.model,
+        tick,
+        layer: this,
+      };
 
-    // Call onDemand callback if provided
-    if (this.onDemandCallback) {
-      this.onDemandCallback(context);
+      // Clear canvas if this layer has offscreen buffer (future enhancement)
+      if (this.config.offscreen) {
+        // TODO: Implement offscreen canvas support
+      }
+
+      // Call onTick callback if provided and tick is available
+      if (this.onTickCallback && tick !== undefined) {
+        this.onTickCallback(context);
+      }
+
+      // Call onDemand callback if provided
+      if (this.onDemandCallback) {
+        this.onDemandCallback(context);
+      }
+    } finally {
+      // Always restore canvas state after layer rendering
+      ctx.restore();
     }
   }
 

@@ -24,10 +24,15 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   private layers: Map<keyof S, DrawingLayer<T>> = new Map();
   private layerVisibility: Map<keyof S, boolean> = new Map();
   private clickHandlers: MouseEventHandler[] = [];
+  private animationRate: number;
+  private animationId?: number;
+  private currentTick: number = 0;
+  private hasAnimatedLayers: boolean = false;
 
   constructor(config: DrawingSurfaceConfig<T, S>) {
     this.model = config.model;
     this.layerSchema = config.layerSchema;
+    this.animationRate = config.animationRate || 60;
 
     // Create canvas element and add to DOM
     this.canvasElement = document.createElement('canvas');
@@ -44,6 +49,11 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
 
     // Create layers based on schema
     this.createLayers();
+
+    // Start animation if any layers are animated
+    if (this.hasAnimatedLayers) {
+      this.startAnimation();
+    }
 
     // Initial render will be triggered by rerender() call after setup
   }
@@ -62,6 +72,11 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
       this.layers.set(layerName, layer);
       // Initialize layer as visible by default
       this.layerVisibility.set(layerName, true);
+
+      // Check if any layer is animated
+      if (layerConfig.animated) {
+        this.hasAnimatedLayers = true;
+      }
     }
   }
 
@@ -167,8 +182,35 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
     return Object.keys(this.layerSchema) as (keyof S)[];
   }
 
+  // Animation methods
+  private startAnimation(): void {
+    const frameTime = 1000 / this.animationRate;
+    let lastTime = 0;
+
+    const animate = (currentTime: number) => {
+      if (currentTime - lastTime >= frameTime) {
+        this.currentTick++;
+        this.render(this.currentTick);
+        lastTime = currentTime;
+      }
+      this.animationId = requestAnimationFrame(animate);
+    };
+
+    this.animationId = requestAnimationFrame(animate);
+  }
+
+  private stopAnimation(): void {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
+    }
+  }
+
   // Clean up resources
   destroy(): void {
+    // Stop animation
+    this.stopAnimation();
+
     // Remove canvas from DOM
     if (this.canvasElement.parentNode) {
       this.canvasElement.parentNode.removeChild(this.canvasElement);
