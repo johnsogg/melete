@@ -1,10 +1,10 @@
 import { Canvas } from './canvas';
-import { Point, Color } from './types';
+import { Pt, Color } from './types';
 
 export function drawLine(
   canvas: Canvas,
-  start: Point,
-  end: Point,
+  start: Pt,
+  end: Pt,
   color?: Color
 ): void {
   const ctx = canvas.getContext();
@@ -19,7 +19,7 @@ export function drawLine(
 
 export function drawPolygon(
   canvas: Canvas,
-  points: Point[],
+  points: Pt[],
   filled: boolean = false,
   color?: Color
 ): void {
@@ -52,9 +52,9 @@ export function drawPolygon(
 
 export function drawTriangle(
   canvas: Canvas,
-  p1: Point,
-  p2: Point,
-  p3: Point,
+  p1: Pt,
+  p2: Pt,
+  p3: Pt,
   filled: boolean = false,
   color?: Color
 ): void {

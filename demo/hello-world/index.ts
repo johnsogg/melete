@@ -44,17 +44,25 @@ mainLayer.onDemand(({ model, layer }) => {
   // Clear with background color
   canvas.clear(model.backgroundColor);
 
-  // Draw a colorful rectangle
-  canvas.setFillColor('#ff6b6b');
-  canvas.fillRect(50, 50, 200, 100);
+  // Draw a colorful rectangle using new semantic API
+  layer.drawRect({
+    topLeft: { x: 50, y: 50 },
+    size: { width: 200, height: 100 },
+    fill: true,
+    color: '#ff6b6b'
+  });
 
-  // Draw a circle if model says to show it
+  // Draw a circle if model says to show it - using new semantic API
   if (model.showCircle) {
-    canvas.setFillColor('#4ecdc4');
-    canvas.fillCircle(400, 100, 60);
+    layer.drawCircle({
+      center: { x: 400, y: 100 },
+      radius: 60,
+      fill: true,
+      color: '#4ecdc4'
+    });
   }
 
-  // Draw some text
+  // Draw some text (still using canvas methods for text)
   canvas.setFillColor('#2c3e50');
   canvas.setFont('32px Arial, sans-serif');
   canvas.fillText(model.title, 150, 250);
