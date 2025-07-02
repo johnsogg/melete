@@ -54,19 +54,24 @@ export type LayerOnTickCallback<T = any> = (
   context: LayerCallbackContext<T>
 ) => void;
 
-// Drawing method parameter interfaces
+// Drawing style interface - separate from geometry
+export interface DrawingStyle {
+  fill?: boolean;
+  color?: Color;
+  stroke?: boolean;
+  strokeThickness?: number;
+  strokeColor?: Color;
+}
+
+// Drawing method parameter interfaces - geometry only
 export interface DrawRectParams {
   topLeft: Pt;
   size: Size;
-  fill?: boolean;
-  color?: Color;
 }
 
 export interface DrawCircleParams {
   center: Pt;
   radius: number;
-  fill?: boolean;
-  color?: Color;
 }
 
 // Drawing surface configuration

@@ -6,6 +6,7 @@ import {
   LayerOnTickCallback,
   DrawRectParams,
   DrawCircleParams,
+  DrawingStyle,
 } from './types';
 
 export class DrawingLayer<T = any> {
@@ -85,46 +86,54 @@ export class DrawingLayer<T = any> {
   }
 
   // Semantic drawing methods
-  drawRect(params: DrawRectParams): void {
+  drawRect(params: DrawRectParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
-
-    if (params.color) {
-      if (params.fill) {
-        ctx.fillStyle = params.color;
-      } else {
-        ctx.strokeStyle = params.color;
-      }
-    }
 
     const x = params.topLeft.x;
     const y = params.topLeft.y;
     const width = params.size.width;
     const height = params.size.height;
 
-    if (params.fill) {
-      ctx.fillRect(x, y, width, height);
-    } else {
-      ctx.strokeRect(x, y, width, height);
-    }
+    // Apply styling and draw
+    this.applyStyleAndDraw(ctx, params, () => {
+      ctx.rect(x, y, width, height);
+    });
   }
 
-  drawCircle(params: DrawCircleParams): void {
+  drawCircle(params: DrawCircleParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
 
-    if (params.color) {
-      if (params.fill) {
-        ctx.fillStyle = params.color;
-      } else {
-        ctx.strokeStyle = params.color;
+    // Apply styling and draw
+    this.applyStyleAndDraw(ctx, params, () => {
+      ctx.arc(params.center.x, params.center.y, params.radius, 0, 2 * Math.PI);
+    });
+  }
+
+  // Helper method to apply styling and perform fill/stroke operations
+  private applyStyleAndDraw(
+    ctx: CanvasRenderingContext2D,
+    style: DrawingStyle,
+    drawPath: () => void
+  ): void {
+    ctx.beginPath();
+    drawPath();
+
+    // Apply fill if requested
+    if (style.fill) {
+      if (style.color) {
+        ctx.fillStyle = style.color;
       }
+      ctx.fill();
     }
 
-    ctx.beginPath();
-    ctx.arc(params.center.x, params.center.y, params.radius, 0, 2 * Math.PI);
-
-    if (params.fill) {
-      ctx.fill();
-    } else {
+    // Apply stroke if requested
+    if (style.stroke) {
+      if (style.strokeColor) {
+        ctx.strokeStyle = style.strokeColor;
+      }
+      if (style.strokeThickness !== undefined) {
+        ctx.lineWidth = style.strokeThickness;
+      }
       ctx.stroke();
     }
   }

@@ -44,23 +44,35 @@ mainLayer.onDemand(({ model, layer }) => {
   // Clear with background color
   canvas.clear(model.backgroundColor);
 
-  // Draw a colorful rectangle using new semantic API
+  // Draw a colorful rectangle using intersection types (geometry & style)
   layer.drawRect({
     topLeft: { x: 50, y: 50 },
     size: { width: 200, height: 100 },
     fill: true,
-    color: '#ff6b6b'
+    color: '#ff6b6b',
   });
 
-  // Draw a circle if model says to show it - using new semantic API
+  // Draw a circle if model says to show it - with stroke styling
   if (model.showCircle) {
     layer.drawCircle({
       center: { x: 400, y: 100 },
       radius: 60,
       fill: true,
-      color: '#4ecdc4'
+      color: '#4ecdc4',
+      stroke: true,
+      strokeColor: '#2c3e50',
+      strokeThickness: 3,
     });
   }
+
+  // Demonstrate stroke-only rectangle
+  layer.drawRect({
+    topLeft: { x: 300, y: 200 },
+    size: { width: 150, height: 80 },
+    stroke: true,
+    strokeColor: '#9b59b6',
+    strokeThickness: 2,
+  });
 
   // Draw some text (still using canvas methods for text)
   canvas.setFillColor('#2c3e50');
