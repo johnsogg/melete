@@ -149,7 +149,6 @@ function init() {
     new DebugPanel<SpaceSceneModel, SpaceLayerSchema>(surface, debugContainer, {
       maxEventHistory: 10,
       updateInterval: 300,
-      expandedByDefault: true,
     });
   }
 }

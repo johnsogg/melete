@@ -54,7 +54,7 @@ export class DebugPanel<T = any, S extends LayerSchema = LayerSchema> {
     this.container = container;
     this.maxEventHistory = options.maxEventHistory || 10;
     this.updateInterval = options.updateInterval || 500;
-    this.expanded = options.expandedByDefault !== false;
+    this.expanded = options.expandedByDefault === true;
 
     this.createUI();
     this.attachEventHandlers();
@@ -64,12 +64,13 @@ export class DebugPanel<T = any, S extends LayerSchema = LayerSchema> {
   private createUI(): void {
     // Create main panel
     this.panelElement = document.createElement('div');
-    this.panelElement.className = 'melete-debug-panel';
+    this.panelElement.className = `melete-debug-panel${this.expanded ? ' expanded' : ''}`;
     this.panelElement.innerHTML = `
-      <div class="debug-header">
-        <h3>🔧 Debug Panel</h3>
-        <button class="debug-toggle">${this.expanded ? '−' : '+'}</button>
+      <div class="debug-header" style="display: ${this.expanded ? 'flex' : 'none'}">
+        <h3><span class="debug-bug-emoji">🐛</span> Debug Panel</h3>
+        <button class="debug-toggle">−</button>
       </div>
+      <button class="debug-toggle-collapsed" style="display: ${this.expanded ? 'none' : 'block'}">🐛</button>
       <div class="debug-content" style="display: ${this.expanded ? 'block' : 'none'}">
         <div class="debug-section">
           <h4>📊 Model State</h4>
@@ -144,13 +145,18 @@ export class DebugPanel<T = any, S extends LayerSchema = LayerSchema> {
     style.textContent = `
       .melete-debug-panel {
         margin-top: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        width: fit-content;
+      }
+      
+      .melete-debug-panel.expanded {
         padding: 15px;
         background: #f8f9fa;
         border: 1px solid #dee2e6;
         border-radius: 8px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 14px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: auto;
       }
       
       .debug-header {
@@ -182,6 +188,31 @@ export class DebugPanel<T = any, S extends LayerSchema = LayerSchema> {
       
       .debug-toggle:hover {
         background: #0056b3;
+      }
+      
+      .debug-toggle-collapsed {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 0;
+        margin: 0;
+        width: auto;
+        height: auto;
+        display: inline-block;
+      }
+      
+      .debug-toggle-collapsed:hover {
+        opacity: 0.7;
+      }
+      
+      .debug-bug-emoji {
+        cursor: pointer;
+        user-select: none;
+      }
+      
+      .debug-bug-emoji:hover {
+        opacity: 0.7;
       }
       
       .debug-section {
@@ -308,15 +339,38 @@ export class DebugPanel<T = any, S extends LayerSchema = LayerSchema> {
   }
 
   private attachEventHandlers(): void {
-    // Toggle panel visibility
-    this.toggleButton.addEventListener('click', () => {
+    const toggleFunction = () => {
       this.expanded = !this.expanded;
+      const header = this.panelElement.querySelector(
+        '.debug-header'
+      ) as HTMLElement;
       const content = this.panelElement.querySelector(
         '.debug-content'
       ) as HTMLElement;
+      const collapsedToggle = this.panelElement.querySelector(
+        '.debug-toggle-collapsed'
+      ) as HTMLElement;
+
+      // Toggle CSS class for styling
+      if (this.expanded) {
+        this.panelElement.classList.add('expanded');
+      } else {
+        this.panelElement.classList.remove('expanded');
+      }
+
+      header.style.display = this.expanded ? 'flex' : 'none';
       content.style.display = this.expanded ? 'block' : 'none';
-      this.toggleButton.textContent = this.expanded ? '−' : '+';
-    });
+      collapsedToggle.style.display = this.expanded ? 'none' : 'block';
+    };
+
+    // Toggle panel visibility from all buttons
+    this.toggleButton.addEventListener('click', toggleFunction);
+    const collapsedToggle = this.panelElement.querySelector(
+      '.debug-toggle-collapsed'
+    )!;
+    collapsedToggle.addEventListener('click', toggleFunction);
+    const bugEmoji = this.panelElement.querySelector('.debug-bug-emoji')!;
+    bugEmoji.addEventListener('click', toggleFunction);
 
     // Attach to surface events
     this.surface.onClick((event: MeleteMouseEvent) => {

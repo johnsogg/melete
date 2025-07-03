@@ -198,7 +198,6 @@ function init() {
       {
         maxEventHistory: 10,
         updateInterval: 300,
-        expandedByDefault: true,
       }
     );
   }

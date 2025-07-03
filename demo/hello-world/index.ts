@@ -154,7 +154,6 @@ if (debugContainer) {
     {
       maxEventHistory: 15,
       updateInterval: 200,
-      expandedByDefault: true,
     }
   );
 }
