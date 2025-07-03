@@ -24,12 +24,7 @@ export class DrawingLayer<T = any> {
   private cacheValid: boolean = false;
   private lastModelHash: string = '';
 
-  constructor(
-    _name: string,
-    config: LayerConfig,
-    canvas: Canvas,
-    model: T
-  ) {
+  constructor(_name: string, config: LayerConfig, canvas: Canvas, model: T) {
     this.config = { ...config };
     this.canvas = canvas;
     this.model = model;
