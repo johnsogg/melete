@@ -10,6 +10,7 @@
 - [x] Fix debug panel label visibility - labels were white on white background (2025-07-04)
 - [x] Fix animation FPS to achieve 60fps instead of throttled low FPS (2025-07-04)
 - [x] Interactive animation of a box-and-arrow diagram (2025-07-04) See section below
+- [x] Fix ESLint TypeScript version compatibility warning (2025-07-04)
 
 ## Box and arrow commit polish (TODO)
 
