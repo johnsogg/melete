@@ -4,12 +4,14 @@ import {
   LayerCallbackContext,
   LayerOnDemandCallback,
   LayerOnTickCallback,
+} from './types';
+import {
   DrawRectParams,
   DrawCircleParams,
   DrawTextParams,
   DrawLineParams,
-  DrawingStyle,
-} from './types';
+} from './geom/types';
+import { DrawingStyle } from './graphics/types';
 import {
   TurtleCommand,
   TurtleState,

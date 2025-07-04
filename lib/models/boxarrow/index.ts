@@ -1,5 +1,6 @@
-import { LayerSchema, Pt } from '../../types';
-import { AnimationState } from '../../graphics';
+import { LayerSchema } from '../../types';
+import { Pt } from '../../geom/types';
+import { AnimationState } from '../../graphics/types';
 
 // Box entity interface
 export interface Box {

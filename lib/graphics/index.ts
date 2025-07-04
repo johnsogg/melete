@@ -1,14 +1,7 @@
-import { Pt } from '../types';
 import { AABB, getAABBSize, BezierQuad, Ray, normalize } from '../geom';
 
-// Animation state interface
-export interface AnimationState {
-  isAnimating: boolean;
-  startTime: number;
-  duration: number;
-  easing: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
-  startPositions: { [boxId: string]: Pt };
-}
+// Re-export types for convenience
+export type { Color, Font, DrawingStyle, AnimationState } from './types';
 
 // Easing functions
 export const easingFunctions = {

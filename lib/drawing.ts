@@ -1,5 +1,6 @@
 import { Canvas } from './canvas';
-import { Pt, Color } from './types';
+import { Pt } from './geom/types';
+import { Color } from './graphics/types';
 
 export function drawLine(
   canvas: Canvas,

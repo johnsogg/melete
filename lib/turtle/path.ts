@@ -5,8 +5,7 @@
 import { TurtleState } from './state';
 import { TurtleCommand } from './commands';
 import { TurtleEngine } from './engine';
-import { Pt } from '../types';
-import { AABB } from '../geom';
+import { Pt, AABB } from '../geom/types';
 
 export interface TurtlePathSegment {
   from: Pt;

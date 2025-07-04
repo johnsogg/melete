@@ -1,4 +1,4 @@
-import { Pt, Vec, Size } from '../types';
+import { Pt, Vec, Size, AABB, Ray, LineSeg, BezierQuad } from './types';
 
 // Vector utility functions
 export const midpoint = (p1: Pt, p2: Pt): Pt => ({
@@ -25,13 +25,17 @@ export const normalize = (vec: Vec): Vec => {
   return { dx: vec.dx / mag, dy: vec.dy / mag };
 };
 
-// Axis-aligned bounding box type
-export type AABB = {
-  minX: number;
-  maxX: number;
-  minY: number;
-  maxY: number;
-};
+// Re-export types for convenience
+export type {
+  Pt,
+  Vec,
+  Size,
+  AABB,
+  Ray,
+  LineSeg,
+  BezierQuad,
+  BezierCubic,
+} from './types';
 
 // Axis-aligned edge definition for intersection calculations
 type AAEdge = {
@@ -39,33 +43,6 @@ type AAEdge = {
   edgeAxis: 'x' | 'y';
   boundMin: number;
   boundMax: number;
-};
-
-// Ray definition - a point and direction vector
-export type Ray = {
-  origin: Pt;
-  direction: Vec;
-};
-
-// Line segment definition - two distinct points
-export type LineSeg = {
-  start: Pt;
-  end: Pt;
-};
-
-// Quadratic Bezier curve definition
-export type BezierQuad = {
-  start: Pt;
-  control: Pt;
-  end: Pt;
-};
-
-// Cubic Bezier curve definition (for future use)
-export type BezierCubic = {
-  start: Pt;
-  control1: Pt;
-  control2: Pt;
-  end: Pt;
 };
 
 // Create AABB from center point and dimensions

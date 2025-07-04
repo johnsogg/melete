@@ -1,4 +1,5 @@
-import { CanvasOptions, Color, Font } from './types';
+import { CanvasOptions } from './types';
+import { Color, Font } from './graphics/types';
 
 export class Canvas {
   private canvas: HTMLCanvasElement;

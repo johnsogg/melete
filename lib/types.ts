@@ -2,35 +2,14 @@
  * Core types for the Melete graphics library
  */
 
-// Basic geometric types - support 2D and 3D
-export interface Pt {
-  x: number;
-  y: number;
-  z?: number;
-}
-
-export interface Vec {
-  dx: number;
-  dy: number;
-  dz?: number;
-}
-
-export interface Size {
-  width: number;
-  height: number;
-}
-
-// Backward compatibility
-export type Point = Pt;
+// Re-export commonly used geometric types for convenience
+export type { Pt, Vec, Size } from './geom/types';
 
 // Canvas and drawing types
 export interface CanvasOptions {
   width: number;
   height: number;
 }
-
-export type Color = string;
-export type Font = string;
 
 // Layer system types
 export interface LayerConfig {
@@ -54,38 +33,6 @@ export type LayerOnDemandCallback<T = any> = (
 export type LayerOnTickCallback<T = any> = (
   context: LayerCallbackContext<T>
 ) => void;
-
-// Drawing style interface - separate from geometry
-export interface DrawingStyle {
-  fill?: boolean;
-  color?: Color;
-  stroke?: boolean;
-  strokeThickness?: number;
-  strokeColor?: Color;
-  font?: Font;
-  textColor?: Color;
-}
-
-// Drawing method parameter interfaces - geometry only
-export interface DrawRectParams {
-  topLeft: Pt;
-  size: Size;
-}
-
-export interface DrawCircleParams {
-  center: Pt;
-  radius: number;
-}
-
-export interface DrawTextParams {
-  text: string;
-  position: Pt;
-}
-
-export interface DrawLineParams {
-  from: Pt;
-  to: Pt;
-}
 
 // Drawing surface configuration
 export interface DrawingSurfaceConfig<
