@@ -12,5 +12,8 @@ export * from './drawing';
 export * from './layer';
 export * from './surface';
 
+// Turtle graphics
+export * from './turtle';
+
 // Debug utilities
 export * from './debug';

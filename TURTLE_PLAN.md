@@ -1,26 +1,60 @@
 # Turtle Graphics Implementation Plan for Melete
 
 ## Overview
+
 Implement a comprehensive turtle graphics system inspired by your FLATCAD architecture, using 4x4 matrix transformations to support both 2D and 3D operations with hierarchical turtle command trees.
 
+The 2D operations can be performed using the same math as 3D by assuming z=0.
+
+After each stage, we need to manually confirm that the demos still work.
+
+Example code:
+
+```ts
+drawTurtleSequence([
+  turtleAngleUnits('radians'), // default for non-specified angle units
+  turtlePenUp(), // turtle operation to lift the pen
+  turtleTurn({
+    // turtle op for turning left/right, pitch, yaw. can accept any but only one will be used, so should give warning if more than one is provided.
+    left: 45,
+    units: 'degrees', // can override the default unit like this
+  }),
+  turtleMove({
+    // turtle op for movement: forward/backward for y dimension, left/right for x dimension, up/down for z dimension
+    forward: 50, // like turning, we can get any of the above properties but only one will be used and should give console warning if more are provided.
+  }),
+  turtlePenDown(), // lower the pen
+  turtleTurn({ pitch: Math.PI / 4 }), // interpreted as radians because of the default
+  turtleRight(Math.PI / 2), // turtleLeft and turtleRight take a positional argument, this is the usual case
+  turtleLeft(45, { units: 'degrees' }), // they take an optional object argument in second position to specify angle units
+]);
+```
+
 ## Stage 1: Mathematical Foundation (3-4 hours)
+
 **Deliverable**: Complete matrix math library
+
 - Create `lib/math/` directory structure
 - Implement 4x4 matrix operations (identity, multiply, translate, rotate)
 - Implement 3D vector utilities (normalize, cross product, dot product)
 - Add comprehensive unit tests for all math operations
 - **Checkpoint**: All matrix math tested and working
 
-## Stage 2: Turtle State Management (2-3 hours)  
+## Stage 2: Turtle State Management (2-3 hours)
+
 **Deliverable**: Basic turtle state system
+
 - Create `TurtleState` class (position, heading vectors, pen state)
-- Implement basic turtle operations: `forward()`, `left()`, `right()`, pen up/down
+- Implement basic turtle operations: forward, left, right, pen up/down
+- The 3D operations will not be implemented yet
 - Add local transformation matrix generation from turtle commands
 - Unit tests for turtle state operations
 - **Checkpoint**: Basic turtle movement working
 
 ## Stage 3: Matrix Stack System (2-3 hours)
+
 **Deliverable**: Transformation accumulation
+
 - Implement matrix stack for push/pop operations
 - Create `TurtleTransform` class for accumulating transformations
 - Add parent-child transformation multiplication (key FLATCAD insight)
@@ -28,7 +62,9 @@ Implement a comprehensive turtle graphics system inspired by your FLATCAD archit
 - **Checkpoint**: Hierarchical transformations working
 
 ## Stage 4: Turtle Command Interface (2-3 hours)
+
 **Deliverable**: Command system architecture
+
 - Design turtle command interface and base classes
 - Implement core command types (move, turn, pen state)
 - Add command execution engine
@@ -36,15 +72,19 @@ Implement a comprehensive turtle graphics system inspired by your FLATCAD archit
 - **Checkpoint**: Command system operational
 
 ## Stage 5: Turtle Tree Structure (3-4 hours)
+
 **Deliverable**: Tree-based turtle program representation
+
 - Implement `TurtleTree` data structure
 - Add parent-child relationship management
-- Create tree traversal for geometry generation  
+- Create tree traversal for geometry generation
 - Path generation from tree traversal
 - **Checkpoint**: Tree structure generates correct paths
 
 ## Stage 6: 2D Melete Integration (3-4 hours)
+
 **Deliverable**: Working 2D turtle graphics
+
 - Integrate turtle system with existing Melete layers
 - Add `turtle()` function to layer drawing operations
 - Implement 2D rendering from turtle paths
@@ -52,7 +92,9 @@ Implement a comprehensive turtle graphics system inspired by your FLATCAD archit
 - **Checkpoint**: 2D turtle graphics fully functional in Melete
 
 ## Stage 7: 3D Extension (4-5 hours)
+
 **Deliverable**: 3D turtle operations
+
 - Extend turtle state for 3D (pitch, roll, yaw rotations)
 - Add 3D-specific turtle commands
 - Implement 3D coordinate transformations
@@ -60,7 +102,9 @@ Implement a comprehensive turtle graphics system inspired by your FLATCAD archit
 - **Checkpoint**: Basic 3D turtle graphics working
 
 ## Stage 8: Advanced Features (3-4 hours)
+
 **Deliverable**: Enhanced turtle capabilities
+
 - Named point system and navigation commands
 - Advanced turtle operations (face point, etc.)
 - Performance optimizations and caching
@@ -70,19 +114,22 @@ Implement a comprehensive turtle graphics system inspired by your FLATCAD archit
 ## Total Estimated Time: 22-30 hours
 
 ## Key Benefits of This Approach:
+
 - Each stage is independently testable and useful
-- Frequent checkpoints prevent "big bang" issues  
+- Frequent checkpoints prevent "big bang" issues
 - Builds incrementally on proven FLATCAD architecture
 - Maintains compatibility with existing Melete features
 - Comprehensive test coverage throughout
 
 ## Key Design Insights from FLATCAD Analysis:
+
 1. **Hierarchical Matrix Multiplication**: Each turtle operation multiplies parent's global transformation with its local transformation
 2. **Separation of Concerns**: Command parsing, matrix operations, and rendering are cleanly separated
 3. **Tree Structure**: Turtle commands form a tree representing the program execution path
 4. **Dual Representation**: Both tree structure (for editing/debugging) and final geometry (for output)
 
 ## Architecture Notes:
+
 - Use 4x4 homogeneous transformation matrices for all operations
 - 2D operations use same matrices as 3D with z=0
 - Matrix stack enables push/pop for branching turtle paths

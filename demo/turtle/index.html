@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turtle Graphics Demo - Melete</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .demo-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        
+        h2 {
+            color: #555;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        #canvas-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        canvas {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .description {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #4CAF50;
+            margin: 20px 0;
+        }
+        
+        .nav {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .nav a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🐢 Turtle Graphics Demo</h1>
+        
+        <div class="description">
+            <p>This demo showcases the turtle graphics system integrated with Melete. Turtle graphics uses simple commands like "move forward" and "turn left" to create complex drawings. Click the buttons below to see different turtle graphics examples!</p>
+        </div>
+        
+        <div class="controls">
+            <button id="draw-square">Draw Square</button>
+            <button id="draw-triangle">Draw Triangle</button>
+            <button id="draw-spiral">Draw Spiral</button>
+            <button id="draw-flower">Draw Flower</button>
+            <button id="draw-tree">Draw Tree</button>
+            <button id="draw-fractal-tree">Fractal Tree</button>
+            <button id="clear-canvas">Clear</button>
+        </div>
+        
+        <div id="canvas-container">
+            <!-- Canvas will be inserted here -->
+        </div>
+        
+        <div class="nav">
+            <a href="../index.html">← Back to Demo Index</a>
+        </div>
+    </div>
+    
+    <script type="module" src="./index.ts"></script>
+</body>
+</html>

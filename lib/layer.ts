@@ -10,6 +10,13 @@ import {
   DrawLineParams,
   DrawingStyle,
 } from './types';
+import {
+  TurtleCommand,
+  TurtleState,
+  generateTurtlePath,
+  renderTurtlePath,
+  executeTurtleSequence,
+} from './turtle';
 
 export class DrawingLayer<T = any> {
   private config: LayerConfig;
@@ -397,5 +404,37 @@ export class DrawingLayer<T = any> {
       ctx.moveTo(params.from.x, params.from.y);
       ctx.lineTo(params.to.x, params.to.y);
     });
+  }
+
+  // Turtle graphics method
+  turtle(
+    commands: TurtleCommand[],
+    options?: {
+      initialState?: TurtleState;
+      strokeStyle?: string;
+      lineWidth?: number;
+      lineCap?: CanvasLineCap;
+      lineJoin?: CanvasLineJoin;
+    }
+  ): TurtleState {
+    const ctx = this.canvas.getContext();
+
+    // Generate path from turtle commands and get final state
+    const path = generateTurtlePath(commands, options?.initialState);
+
+    // Also execute the commands to get the proper final state with orientation
+    const finalState = executeTurtleSequence(commands, options?.initialState);
+
+    // Render the path to canvas
+    const style = {
+      strokeStyle: options?.strokeStyle,
+      lineWidth: options?.lineWidth,
+      lineCap: options?.lineCap,
+      lineJoin: options?.lineJoin,
+    };
+
+    renderTurtlePath(ctx, path, style);
+
+    return finalState;
   }
 }

@@ -20,7 +20,8 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./lib/*"]
-    }
+    },
+    "types": ["vitest/globals"]
   },
   "include": [
     "lib/**/*",
