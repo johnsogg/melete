@@ -280,6 +280,7 @@ export class DebugPanel<T = any, S extends LayerSchema = LayerSchema> {
         background: #ffffff;
         border: 1px solid #ced4da;
         border-radius: 4px;
+        color: #495057;
       }
       
       .debug-fps, .debug-render-time, .debug-avg-render, .debug-render-count,

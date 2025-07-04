@@ -24,7 +24,6 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   private layers: Map<keyof S, DrawingLayer<T>> = new Map();
   private layerVisibility: Map<keyof S, boolean> = new Map();
   private clickHandlers: MouseEventHandler[] = [];
-  private animationRate: number;
   private animationId?: number;
   private currentTick: number = 0;
   private hasAnimatedLayers: boolean = false;
@@ -32,7 +31,6 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   constructor(config: DrawingSurfaceConfig<T, S>) {
     this.model = config.model;
     this.layerSchema = config.layerSchema;
-    this.animationRate = config.animationRate || 60;
 
     // Create canvas element and add to DOM
     this.canvasElement = document.createElement('canvas');
@@ -196,15 +194,9 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
 
   // Animation methods
   private startAnimation(): void {
-    const frameTime = 1000 / this.animationRate;
-    let lastTime = 0;
-
-    const animate = (currentTime: number) => {
-      if (currentTime - lastTime >= frameTime) {
-        this.currentTick++;
-        this.render(this.currentTick);
-        lastTime = currentTime;
-      }
+    const animate = () => {
+      this.currentTick++;
+      this.render(this.currentTick);
       this.animationId = requestAnimationFrame(animate);
     };
 

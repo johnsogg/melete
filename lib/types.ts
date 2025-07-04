@@ -96,5 +96,4 @@ export interface DrawingSurfaceConfig<
   layerSchema: S;
   canvasOptions?: CanvasOptions;
   container?: HTMLElement;
-  animationRate?: number;
 }

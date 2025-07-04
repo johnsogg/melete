@@ -91,7 +91,6 @@ function init() {
       width: 800,
       height: 600,
     },
-    animationRate: 60,
   });
 
   // Set up animated background layer - twinkling stars
