@@ -17,3 +17,12 @@ export * from './turtle';
 
 // Debug utilities
 export * from './debug';
+
+// Graphics utilities
+export * from './graphics';
+
+// Geometry utilities
+export * from './geom';
+
+// Models
+export * from './models/boxarrow';

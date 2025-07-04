@@ -52,3 +52,4 @@ This is a fresh start - the project was recently reset while preserving git hist
 - Refer to TODO.md for checklists of current feature ideas, bugs, and tooling fixes
 - Before finishing a task, execute `npm run lint:fix` to automatically fix formatting issues
 - Use `npm run check` to ensure the linter, static typing, and tests all pass
+- Use arrow functions whenever technically possible

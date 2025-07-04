@@ -1,6 +1,7 @@
 # TODOs - keep this clean
 
 - Support 3D (2025-07-02)
+- [x] Much of the code in the box-and-arrow commit from July 3 could potentially be brought in to the library because we will need both math routines and graphics routines. There is quite a lot of repetitive code that is DRY-worthy so we can clean that up as well. (2025-07-04) See the box and arrow commit polish extended description below.
 - [x] Update the debugging panel such that it is minimized by default, and uses a little bug emoji as its trigger (2025-07-02)
 - [x] Support simple turtle drawing operations including `move`, `left`, `right` (2025-07-02)
 - [x] We need to support matrix operations for turtle operations in 2D and 3D. Each turtle operation will entail one or more matrix operations that are applied together as a stack. It should be sufficient to use a 4x4 matrix to support all 2D and 3D operations. 2D operations can be simply use the same matrix as 3D, assuming z=0. (2025-07-02)
@@ -10,7 +11,29 @@
 - [x] Fix animation FPS to achieve 60fps instead of throttled low FPS (2025-07-04)
 - [x] Interactive animation of a box-and-arrow diagram (2025-07-04) See section below
 
-## Box and arrow diagram animation
+## Box and arrow commit polish (TODO)
+
+Yesterday we added the feature described in the section below (Box and arrow
+diagram animation (completed)). I am leaving the description there for your
+benefit.
+
+The code we wrote for that currently lives in the demo, but after reading it I
+realize that it can be re-usable in a few ways. I have gone through the
+box-arrow/index.ts file and marked each symbol with tags:
+
+- @demo - keep the code where it is
+- @boxarrow - please move this code into /lib/models/boxarrow
+- @graphics - move into /lib/graphics
+- @geom - move into /lib/geom
+
+There is a README.md file in the three new destination directories with a brief
+description.
+
+There are additional opportunities to clean the code up, but for this first
+task, let's just move the code over and update references so everything runs and
+the tests pass.
+
+## Box and arrow diagram animation (completed)
 
 For this next demo, I would like to add features to the library to support
 interactive animations of box-and-arrow diagrams that are commonly used in data
