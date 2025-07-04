@@ -6,6 +6,7 @@ import { TurtleState } from './state';
 import { TurtleCommand } from './commands';
 import { TurtleEngine } from './engine';
 import { Pt } from '../types';
+import { AABB } from '../geom';
 
 export interface TurtlePathSegment {
   from: Pt;
@@ -15,12 +16,7 @@ export interface TurtlePathSegment {
 
 export interface TurtlePath {
   segments: TurtlePathSegment[];
-  bounds: {
-    minX: number;
-    maxX: number;
-    minY: number;
-    maxY: number;
-  };
+  bounds: AABB;
 }
 
 export class TurtlePathGenerator {

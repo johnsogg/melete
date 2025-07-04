@@ -1,4 +1,5 @@
-import { DrawingSurface, Pt } from '../../lib/index';
+import { DrawingSurface, Pt, Vec } from '../../lib/index';
+import { AABB } from '../../lib/geom';
 import {
   Box,
   Edge,
@@ -15,9 +16,9 @@ import {
 import {
   getRandomPosition,
   getBoxEdgeIntersection,
-  getBezierBoxIntersection,
+  getQuadBezierBoxIntersection,
   calculateCurveControlPoint,
-  getTangentAtQuadraticBezierEnd,
+  getTangentAtQuadBezierEnd,
 } from '../../lib/geom';
 
 // Create initial model @demo
@@ -186,26 +187,27 @@ function init() {
 
         // Calculate control point for the curve (bends to the right)
         const controlPoint = calculateCurveControlPoint(
-          fromCenter,
-          toCenter,
+          { start: fromCenter, end: toCenter },
           0.25
         );
 
         // Use exact symbolic intersection for precise edge points
-        const fromEdge = getBezierBoxIntersection(
-          fromCenter,
-          controlPoint,
-          toCenter,
+        const bezierCurve = {
+          start: fromCenter,
+          control: controlPoint,
+          end: toCenter,
+        };
+
+        const fromEdge = getQuadBezierBoxIntersection(
+          bezierCurve,
           fromCenter,
           fromBox.width,
           fromBox.height,
           true // from start
         );
 
-        const toEdge = getBezierBoxIntersection(
-          fromCenter,
-          controlPoint,
-          toCenter,
+        const toEdge = getQuadBezierBoxIntersection(
+          bezierCurve,
           toCenter,
           toBox.width,
           toBox.height,
@@ -214,47 +216,44 @@ function init() {
 
         // Recalculate control point based on actual edge points
         const adjustedControlPoint = calculateCurveControlPoint(
-          fromEdge,
-          toEdge,
+          { start: fromEdge, end: toEdge },
           0.25
         );
 
         // Draw curved edge
-        drawCurvedEdge(
-          ctx,
-          fromEdge,
-          toEdge,
-          adjustedControlPoint,
-          edge.strokeColor,
-          edge.strokeThickness
-        );
+        ctx.strokeStyle = edge.strokeColor;
+        ctx.lineWidth = edge.strokeThickness;
+        ctx.beginPath();
+        drawCurvedEdge(ctx, {
+          start: fromEdge,
+          control: adjustedControlPoint,
+          end: toEdge,
+        });
+        ctx.stroke();
 
         // Calculate direction at the end of the curve for arrowhead
-        let direction = getTangentAtQuadraticBezierEnd(
-          adjustedControlPoint,
-          toEdge
-        );
+        let direction: Vec = getTangentAtQuadBezierEnd(bezierCurve);
 
         // Safety check: if direction is zero or very small, fall back to straight line direction
         const directionMagnitude = Math.sqrt(
-          direction.x * direction.x + direction.y * direction.y
+          direction.dx * direction.dx + direction.dy * direction.dy
         );
         if (directionMagnitude < 0.1) {
-          const fallbackDirection = {
-            x: toEdge.x - fromEdge.x,
-            y: toEdge.y - fromEdge.y,
+          const fallbackDirection: Vec = {
+            dx: toEdge.x - fromEdge.x,
+            dy: toEdge.y - fromEdge.y,
           };
           const fallbackMagnitude = Math.sqrt(
-            fallbackDirection.x * fallbackDirection.x +
-              fallbackDirection.y * fallbackDirection.y
+            fallbackDirection.dx * fallbackDirection.dx +
+              fallbackDirection.dy * fallbackDirection.dy
           );
           if (fallbackMagnitude > 0) {
             direction = {
-              x: fallbackDirection.x / fallbackMagnitude,
-              y: fallbackDirection.y / fallbackMagnitude,
+              dx: fallbackDirection.dx / fallbackMagnitude,
+              dy: fallbackDirection.dy / fallbackMagnitude,
             };
           } else {
-            direction = { x: 1, y: 0 }; // Default direction
+            direction = { dx: 1, dy: 0 }; // Default direction
           }
         }
 
@@ -262,8 +261,7 @@ function init() {
         ctx.fillStyle = edge.strokeColor;
         drawArrowhead(
           ctx,
-          toEdge,
-          direction,
+          { origin: toEdge, direction },
           edge.arrowheadStyle,
           edge.arrowheadSize
         );
@@ -273,16 +271,14 @@ function init() {
         const toCenter = toBox.position;
 
         const fromEdge = getBoxEdgeIntersection(
-          toCenter,
-          fromCenter,
+          { start: fromCenter, end: toCenter },
           fromCenter,
           fromBox.width,
           fromBox.height
         );
 
         const toEdge = getBoxEdgeIntersection(
-          fromCenter,
-          toCenter,
+          { start: fromCenter, end: toCenter },
           toCenter,
           toBox.width,
           toBox.height
@@ -297,16 +293,15 @@ function init() {
         ctx.stroke();
 
         // Draw arrowhead
-        const direction = {
-          x: toEdge.x - fromEdge.x,
-          y: toEdge.y - fromEdge.y,
+        const direction: Vec = {
+          dx: toEdge.x - fromEdge.x,
+          dy: toEdge.y - fromEdge.y,
         };
 
         ctx.fillStyle = edge.strokeColor;
         drawArrowhead(
           ctx,
-          toEdge,
-          direction,
+          { origin: toEdge, direction },
           edge.arrowheadStyle,
           edge.arrowheadSize
         );
@@ -354,16 +349,22 @@ function init() {
     model.boxes.forEach(box => {
       const x = box.position.x - box.width / 2;
       const y = box.position.y - box.height / 2;
+      const aabb: AABB = {
+        minX: x,
+        minY: y,
+        maxX: x + box.width,
+        maxY: y + box.height,
+      };
 
       // Draw box background
       ctx.fillStyle = box.fillColor;
-      drawRoundedRect(ctx, x, y, box.width, box.height, box.cornerRadius);
+      drawRoundedRect(ctx, aabb, box.cornerRadius);
       ctx.fill();
 
       // Draw box border
       ctx.strokeStyle = box.borderColor;
       ctx.lineWidth = box.borderThickness;
-      drawRoundedRect(ctx, x, y, box.width, box.height, box.cornerRadius);
+      drawRoundedRect(ctx, aabb, box.cornerRadius);
       ctx.stroke();
 
       // Draw text

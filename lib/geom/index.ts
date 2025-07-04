@@ -1,4 +1,115 @@
-import { Pt } from '../types';
+import { Pt, Vec, Size } from '../types';
+
+// Axis-aligned bounding box type
+export type AABB = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};
+
+// Axis-aligned edge definition for intersection calculations
+type AAEdge = {
+  edgePosition: number;
+  edgeAxis: 'x' | 'y';
+  boundMin: number;
+  boundMax: number;
+};
+
+// Ray definition - a point and direction vector
+export type Ray = {
+  origin: Pt;
+  direction: Vec;
+};
+
+// Line segment definition - two distinct points
+export type LineSeg = {
+  start: Pt;
+  end: Pt;
+};
+
+// Quadratic Bezier curve definition
+export type BezierQuad = {
+  start: Pt;
+  control: Pt;
+  end: Pt;
+};
+
+// Cubic Bezier curve definition (for future use)
+export type BezierCubic = {
+  start: Pt;
+  control1: Pt;
+  control2: Pt;
+  end: Pt;
+};
+
+// Create AABB from center point and dimensions
+const makeAABB = (center: Pt, width: number, height: number): AABB => ({
+  minX: center.x - width / 2,
+  maxX: center.x + width / 2,
+  minY: center.y - height / 2,
+  maxY: center.y + height / 2,
+});
+
+// Get width and height of an AABB
+export const getAABBSize = (aabb: AABB): Size => ({
+  width: aabb.maxX - aabb.minX,
+  height: aabb.maxY - aabb.minY,
+});
+
+// Get all four edges of an AABB
+const getEdges = (aabb: AABB): AAEdge[] => [
+  {
+    edgePosition: aabb.minY,
+    edgeAxis: 'y',
+    boundMin: aabb.minX,
+    boundMax: aabb.maxX,
+  }, // Top
+  {
+    edgePosition: aabb.maxY,
+    edgeAxis: 'y',
+    boundMin: aabb.minX,
+    boundMax: aabb.maxX,
+  }, // Bottom
+  {
+    edgePosition: aabb.minX,
+    edgeAxis: 'x',
+    boundMin: aabb.minY,
+    boundMax: aabb.maxY,
+  }, // Left
+  {
+    edgePosition: aabb.maxX,
+    edgeAxis: 'x',
+    boundMin: aabb.minY,
+    boundMax: aabb.maxY,
+  }, // Right
+];
+
+// Helper function to find intersection between a ray and an axis-aligned edge
+const findEdgeIntersection = (ray: Ray, edge: AAEdge): Pt[] => {
+  const { edgePosition, edgeAxis, boundMin, boundMax } = edge;
+
+  const isVerticalEdge = edgeAxis === 'x';
+  const delta = isVerticalEdge ? ray.direction.dx : ray.direction.dy;
+  const lineCoord = isVerticalEdge ? ray.origin.x : ray.origin.y;
+
+  if (delta === 0) return [];
+
+  const t = (edgePosition - lineCoord) / delta;
+  if (t < 0 || t > 1) return [];
+
+  const crossDelta = isVerticalEdge ? ray.direction.dy : ray.direction.dx;
+  const lineCrossCoord = isVerticalEdge ? ray.origin.y : ray.origin.x;
+  const crossCoord = lineCrossCoord + t * crossDelta;
+
+  if (crossCoord < boundMin || crossCoord > boundMax) return [];
+
+  const intersection = isVerticalEdge
+    ? { x: edgePosition, y: crossCoord }
+    : { x: crossCoord, y: edgePosition };
+
+  return [intersection];
+};
 
 // Generate random position within canvas bounds with box margin
 export const getRandomPosition = (): Pt => {
@@ -12,65 +123,23 @@ export const getRandomPosition = (): Pt => {
   };
 };
 
-// Calculate intersection point between line and rectangle
+// Calculate intersection point between line segment and rectangle
 export const getBoxEdgeIntersection = (
-  lineStart: Pt,
-  lineEnd: Pt,
+  seg: LineSeg,
   boxCenter: Pt,
   boxWidth: number,
   boxHeight: number
 ): Pt => {
-  const dx = lineEnd.x - lineStart.x;
-  const dy = lineEnd.y - lineStart.y;
-
-  const halfWidth = boxWidth / 2;
-  const halfHeight = boxHeight / 2;
+  const dx = seg.end.x - seg.start.x;
+  const dy = seg.end.y - seg.start.y;
 
   // Calculate intersection with each edge of the box
+  const aabb = makeAABB(boxCenter, boxWidth, boxHeight);
+  const ray: Ray = { origin: seg.start, direction: { dx, dy } };
+
   const intersections: Pt[] = [];
-
-  // Top edge
-  if (dy !== 0) {
-    const t = (boxCenter.y - halfHeight - lineStart.y) / dy;
-    if (t >= 0 && t <= 1) {
-      const x = lineStart.x + t * dx;
-      if (x >= boxCenter.x - halfWidth && x <= boxCenter.x + halfWidth) {
-        intersections.push({ x, y: boxCenter.y - halfHeight });
-      }
-    }
-  }
-
-  // Bottom edge
-  if (dy !== 0) {
-    const t = (boxCenter.y + halfHeight - lineStart.y) / dy;
-    if (t >= 0 && t <= 1) {
-      const x = lineStart.x + t * dx;
-      if (x >= boxCenter.x - halfWidth && x <= boxCenter.x + halfWidth) {
-        intersections.push({ x, y: boxCenter.y + halfHeight });
-      }
-    }
-  }
-
-  // Left edge
-  if (dx !== 0) {
-    const t = (boxCenter.x - halfWidth - lineStart.x) / dx;
-    if (t >= 0 && t <= 1) {
-      const y = lineStart.y + t * dy;
-      if (y >= boxCenter.y - halfHeight && y <= boxCenter.y + halfHeight) {
-        intersections.push({ x: boxCenter.x - halfWidth, y });
-      }
-    }
-  }
-
-  // Right edge
-  if (dx !== 0) {
-    const t = (boxCenter.x + halfWidth - lineStart.x) / dx;
-    if (t >= 0 && t <= 1) {
-      const y = lineStart.y + t * dy;
-      if (y >= boxCenter.y - halfHeight && y <= boxCenter.y + halfHeight) {
-        intersections.push({ x: boxCenter.x + halfWidth, y });
-      }
-    }
+  for (const edge of getEdges(aabb)) {
+    intersections.push(...findEdgeIntersection(ray, edge));
   }
 
   // Return the closest intersection to the line end
@@ -79,13 +148,11 @@ export const getBoxEdgeIntersection = (
   }
 
   return intersections.reduce((closest, current) => {
-    const closestDist = Math.sqrt(
-      Math.pow(closest.x - lineEnd.x, 2) + Math.pow(closest.y - lineEnd.y, 2)
-    );
-    const currentDist = Math.sqrt(
-      Math.pow(current.x - lineEnd.x, 2) + Math.pow(current.y - lineEnd.y, 2)
-    );
-    return currentDist < closestDist ? current : closest;
+    const closestDistSq =
+      Math.pow(closest.x - seg.end.x, 2) + Math.pow(closest.y - seg.end.y, 2);
+    const currentDistSq =
+      Math.pow(current.x - seg.end.x, 2) + Math.pow(current.y - seg.end.y, 2);
+    return currentDistSq < closestDistSq ? current : closest;
   });
 };
 
@@ -96,7 +163,7 @@ export const solveQuadratic = (a: number, b: number, c: number): number[] => {
     if (Math.abs(b) < 1e-10) return [];
     return [-c / b];
   }
-
+  // Dear Mr. Flater comma sir: the quadratic formula is implemented below. RIP.
   const discriminant = b * b - 4 * a * c;
   if (discriminant < 0) return [];
 
@@ -105,10 +172,8 @@ export const solveQuadratic = (a: number, b: number, c: number): number[] => {
 };
 
 // Find intersection between quadratic Bezier curve and horizontal line
-export const intersectBezierWithHorizontalLine = (
-  start: Pt,
-  control: Pt,
-  end: Pt,
+export const intersectQuadBezierWithHorizontalLine = (
+  bezier: BezierQuad,
   y: number
 ): number[] => {
   // Bezier curve: B(t) = (1-t)²P₀ + 2t(1-t)P₁ + t²P₂
@@ -116,33 +181,29 @@ export const intersectBezierWithHorizontalLine = (
   // Expand: By(t) = y₀ - 2y₀t + y₀t² + 2y₁t - 2y₁t² + y₂t²
   // Rearrange: By(t) = (y₀ - 2y₁ + y₂)t² + (-2y₀ + 2y₁)t + y₀
 
-  const a = start.y - 2 * control.y + end.y;
-  const b = -2 * start.y + 2 * control.y;
-  const c = start.y - y;
+  const a = bezier.start.y - 2 * bezier.control.y + bezier.end.y;
+  const b = -2 * bezier.start.y + 2 * bezier.control.y;
+  const c = bezier.start.y - y;
 
   return solveQuadratic(a, b, c).filter(t => t >= 0 && t <= 1);
 };
 
 // Find intersection between quadratic Bezier curve and vertical line
-export const intersectBezierWithVerticalLine = (
-  start: Pt,
-  control: Pt,
-  end: Pt,
+export const intersectQuadBezierWithVerticalLine = (
+  bezier: BezierQuad,
   x: number
 ): number[] => {
   // Same as horizontal, but for x-coordinate
-  const a = start.x - 2 * control.x + end.x;
-  const b = -2 * start.x + 2 * control.x;
-  const c = start.x - x;
+  const a = bezier.start.x - 2 * bezier.control.x + bezier.end.x;
+  const b = -2 * bezier.start.x + 2 * bezier.control.x;
+  const c = bezier.start.x - x;
 
   return solveQuadratic(a, b, c).filter(t => t >= 0 && t <= 1);
 };
 
 // Find exact intersection between quadratic Bezier curve and rectangle
-export const getBezierBoxIntersection = (
-  start: Pt,
-  control: Pt,
-  end: Pt,
+export const getQuadBezierBoxIntersection = (
+  bezier: BezierQuad,
   boxCenter: Pt,
   boxWidth: number,
   boxHeight: number,
@@ -154,14 +215,12 @@ export const getBezierBoxIntersection = (
   const intersections: { t: number; point: Pt }[] = [];
 
   // Top edge (y = boxCenter.y - halfHeight)
-  const topTs = intersectBezierWithHorizontalLine(
-    start,
-    control,
-    end,
+  const topTs = intersectQuadBezierWithHorizontalLine(
+    bezier,
     boxCenter.y - halfHeight
   );
   for (const t of topTs) {
-    const point = getPointOnQuadraticBezier(start, control, end, t);
+    const point = getPointOnQuadBezier(bezier, t);
     if (
       point.x >= boxCenter.x - halfWidth &&
       point.x <= boxCenter.x + halfWidth
@@ -171,14 +230,12 @@ export const getBezierBoxIntersection = (
   }
 
   // Bottom edge (y = boxCenter.y + halfHeight)
-  const bottomTs = intersectBezierWithHorizontalLine(
-    start,
-    control,
-    end,
+  const bottomTs = intersectQuadBezierWithHorizontalLine(
+    bezier,
     boxCenter.y + halfHeight
   );
   for (const t of bottomTs) {
-    const point = getPointOnQuadraticBezier(start, control, end, t);
+    const point = getPointOnQuadBezier(bezier, t);
     if (
       point.x >= boxCenter.x - halfWidth &&
       point.x <= boxCenter.x + halfWidth
@@ -188,14 +245,12 @@ export const getBezierBoxIntersection = (
   }
 
   // Left edge (x = boxCenter.x - halfWidth)
-  const leftTs = intersectBezierWithVerticalLine(
-    start,
-    control,
-    end,
+  const leftTs = intersectQuadBezierWithVerticalLine(
+    bezier,
     boxCenter.x - halfWidth
   );
   for (const t of leftTs) {
-    const point = getPointOnQuadraticBezier(start, control, end, t);
+    const point = getPointOnQuadBezier(bezier, t);
     if (
       point.y >= boxCenter.y - halfHeight &&
       point.y <= boxCenter.y + halfHeight
@@ -205,14 +260,12 @@ export const getBezierBoxIntersection = (
   }
 
   // Right edge (x = boxCenter.x + halfWidth)
-  const rightTs = intersectBezierWithVerticalLine(
-    start,
-    control,
-    end,
+  const rightTs = intersectQuadBezierWithVerticalLine(
+    bezier,
     boxCenter.x + halfWidth
   );
   for (const t of rightTs) {
-    const point = getPointOnQuadraticBezier(start, control, end, t);
+    const point = getPointOnQuadBezier(bezier, t);
     if (
       point.y >= boxCenter.y - halfHeight &&
       point.y <= boxCenter.y + halfHeight
@@ -245,61 +298,71 @@ export const getBezierBoxIntersection = (
 
 // Calculate control point for curved edge (bends to the right)
 export const calculateCurveControlPoint = (
-  start: Pt,
-  end: Pt,
+  seg: LineSeg,
   curvature: number = 0.3
 ): Pt => {
-  const midX = (start.x + end.x) / 2;
-  const midY = (start.y + end.y) / 2;
+  const midX = (seg.start.x + seg.end.x) / 2;
+  const midY = (seg.start.y + seg.end.y) / 2;
+
+  // Calculate direction vector from start to end
+  const direction: Vec = {
+    dx: seg.end.x - seg.start.x,
+    dy: seg.end.y - seg.start.y,
+  };
 
   // Calculate perpendicular vector (rotated 90 degrees to the right)
-  const dx = end.x - start.x;
-  const dy = end.y - start.y;
-  const perpX = dy; // 90 degree rotation: (x,y) -> (y,-x)
-  const perpY = -dx;
+  const perpendicular: Vec = {
+    dx: direction.dy, // 90 degree rotation: (dx,dy) -> (dy,-dx)
+    dy: -direction.dx,
+  };
 
   // Normalize perpendicular vector
-  const length = Math.sqrt(perpX * perpX + perpY * perpY);
+  const length = Math.sqrt(
+    perpendicular.dx * perpendicular.dx + perpendicular.dy * perpendicular.dy
+  );
   if (length === 0) return { x: midX, y: midY };
 
-  const normalizedPerpX = perpX / length;
-  const normalizedPerpY = perpY / length;
+  const normalizedPerpendicular: Vec = {
+    dx: perpendicular.dx / length,
+    dy: perpendicular.dy / length,
+  };
 
   // Calculate control point offset
   const offset = length * curvature;
 
   return {
-    x: midX + normalizedPerpX * offset,
-    y: midY + normalizedPerpY * offset,
+    x: midX + normalizedPerpendicular.dx * offset,
+    y: midY + normalizedPerpendicular.dy * offset,
   };
 };
 
 // Calculate point on quadratic Bezier curve at parameter t (0 to 1)
-export const getPointOnQuadraticBezier = (
-  start: Pt,
-  control: Pt,
-  end: Pt,
-  t: number
-): Pt => {
+export const getPointOnQuadBezier = (bezier: BezierQuad, t: number): Pt => {
   const u = 1 - t;
   return {
-    x: u * u * start.x + 2 * u * t * control.x + t * t * end.x,
-    y: u * u * start.y + 2 * u * t * control.y + t * t * end.y,
+    x:
+      u * u * bezier.start.x +
+      2 * u * t * bezier.control.x +
+      t * t * bezier.end.x,
+    y:
+      u * u * bezier.start.y +
+      2 * u * t * bezier.control.y +
+      t * t * bezier.end.y,
   };
 };
 
 // Calculate tangent direction at end of quadratic Bezier curve
-export const getTangentAtQuadraticBezierEnd = (control: Pt, end: Pt): Pt => {
+export const getTangentAtQuadBezierEnd = (bezier: BezierQuad): Vec => {
   // Tangent at t=1 is 2(end - control)
-  const tangentX = 2 * (end.x - control.x);
-  const tangentY = 2 * (end.y - control.y);
+  const tangentX = 2 * (bezier.end.x - bezier.control.x);
+  const tangentY = 2 * (bezier.end.y - bezier.control.y);
 
   // Normalize
   const length = Math.sqrt(tangentX * tangentX + tangentY * tangentY);
-  if (length === 0) return { x: 1, y: 0 };
+  if (length === 0) return { dx: 1, dy: 0 };
 
   return {
-    x: tangentX / length,
-    y: tangentY / length,
+    dx: tangentX / length,
+    dy: tangentY / length,
   };
 };

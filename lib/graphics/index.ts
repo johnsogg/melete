@@ -1,4 +1,5 @@
 import { Pt } from '../types';
+import { AABB, getAABBSize, BezierQuad, Ray } from '../geom';
 
 // Animation state interface
 export interface AnimationState {
@@ -21,66 +22,67 @@ export const easingFunctions = {
 // Draw rounded rectangle
 export const drawRoundedRect = (
   ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
+  aabb: AABB,
   radius: number
 ) => {
+  const { minX, minY } = aabb;
+  const { width, height } = getAABBSize(aabb);
+
   ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.moveTo(minX + radius, minY);
+  ctx.lineTo(minX + width - radius, minY);
+  ctx.quadraticCurveTo(minX + width, minY, minX + width, minY + radius);
+  ctx.lineTo(minX + width, minY + height - radius);
+  ctx.quadraticCurveTo(
+    minX + width,
+    minY + height,
+    minX + width - radius,
+    minY + height
+  );
+  ctx.lineTo(minX + radius, minY + height);
+  ctx.quadraticCurveTo(minX, minY + height, minX, minY + height - radius);
+  ctx.lineTo(minX, minY + radius);
+  ctx.quadraticCurveTo(minX, minY, minX + radius, minY);
   ctx.closePath();
 };
 
 // Draw curved edge using quadratic Bezier curve
 export const drawCurvedEdge = (
   ctx: CanvasRenderingContext2D,
-  start: Pt,
-  end: Pt,
-  controlPoint: Pt,
-  strokeColor: string,
-  strokeThickness: number
+  bezier: BezierQuad
 ) => {
-  ctx.strokeStyle = strokeColor;
-  ctx.lineWidth = strokeThickness;
-  ctx.beginPath();
-  ctx.moveTo(start.x, start.y);
-  ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, end.x, end.y);
-  ctx.stroke();
+  ctx.moveTo(bezier.start.x, bezier.start.y);
+  ctx.quadraticCurveTo(
+    bezier.control.x,
+    bezier.control.y,
+    bezier.end.x,
+    bezier.end.y
+  );
 };
 
 // Draw arrowhead
 export const drawArrowhead = (
   ctx: CanvasRenderingContext2D,
-  tip: Pt,
-  direction: Pt,
+  ray: Ray,
   style: 'v' | 'triangle',
   size: { width: number; length: number }
 ) => {
-  const angle = Math.atan2(direction.y, direction.x);
+  const angle = Math.atan2(ray.direction.dy, ray.direction.dx);
   const perpAngle1 = angle + Math.PI - Math.PI / 6;
   const perpAngle2 = angle + Math.PI + Math.PI / 6;
 
   const p1 = {
-    x: tip.x + Math.cos(perpAngle1) * size.length,
-    y: tip.y + Math.sin(perpAngle1) * size.length,
+    x: ray.origin.x + Math.cos(perpAngle1) * size.length,
+    y: ray.origin.y + Math.sin(perpAngle1) * size.length,
   };
 
   const p2 = {
-    x: tip.x + Math.cos(perpAngle2) * size.length,
-    y: tip.y + Math.sin(perpAngle2) * size.length,
+    x: ray.origin.x + Math.cos(perpAngle2) * size.length,
+    y: ray.origin.y + Math.sin(perpAngle2) * size.length,
   };
 
   ctx.beginPath();
-  ctx.moveTo(tip.x, tip.y);
+  ctx.moveTo(ray.origin.x, ray.origin.y);
   ctx.lineTo(p1.x, p1.y);
 
   if (style === 'triangle') {
@@ -88,7 +90,7 @@ export const drawArrowhead = (
     ctx.closePath();
     ctx.fill();
   } else {
-    ctx.moveTo(tip.x, tip.y);
+    ctx.moveTo(ray.origin.x, ray.origin.y);
     ctx.lineTo(p2.x, p2.y);
     ctx.stroke();
   }
