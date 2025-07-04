@@ -1,7 +1,8 @@
-import { AABB, getAABBSize, BezierQuad, Ray, normalize } from '../geom';
+import { AABB, getAABBSize, BezierQuad, Ray, normalize, Pt } from '../geom';
 
 // Re-export types for convenience
 export type { Color, Font, DrawingStyle, AnimationState } from './types';
+import { DrawingStyle } from './types';
 
 // Easing functions
 export const easingFunctions = {
@@ -104,5 +105,109 @@ export const drawArrowhead = (
     ctx.moveTo(ray.origin.x, ray.origin.y);
     ctx.lineTo(p2.x, p2.y);
     ctx.stroke();
+  }
+};
+
+// Apply drawing styles to canvas context
+export const applyCanvasStyle = (
+  ctx: CanvasRenderingContext2D,
+  style: DrawingStyle
+): void => {
+  if (style.color) {
+    ctx.fillStyle = style.color;
+  }
+  if (style.strokeColor) {
+    ctx.strokeStyle = style.strokeColor;
+  }
+  if (style.strokeThickness !== undefined) {
+    ctx.lineWidth = style.strokeThickness;
+  }
+  if (style.font) {
+    ctx.font = style.font;
+  }
+  if (style.textColor) {
+    ctx.fillStyle = style.textColor;
+  }
+};
+
+// Apply styling and perform fill/stroke operations
+export const applyStyleAndDraw = (
+  ctx: CanvasRenderingContext2D,
+  style: DrawingStyle,
+  drawPath: () => void
+): void => {
+  ctx.beginPath();
+  drawPath();
+
+  if (style.fill) {
+    applyCanvasStyle(ctx, style);
+    ctx.fill();
+  }
+
+  if (style.stroke) {
+    applyCanvasStyle(ctx, style);
+    ctx.stroke();
+  }
+};
+
+// Draw rectangle with semantic parameters and styling
+export const drawRect = (
+  ctx: CanvasRenderingContext2D,
+  topLeft: Pt,
+  width: number,
+  height: number,
+  style: DrawingStyle
+): void => {
+  applyStyleAndDraw(ctx, style, () => {
+    ctx.rect(topLeft.x, topLeft.y, width, height);
+  });
+};
+
+// Draw circle with semantic parameters and styling
+export const drawCircle = (
+  ctx: CanvasRenderingContext2D,
+  center: Pt,
+  radius: number,
+  style: DrawingStyle
+): void => {
+  applyStyleAndDraw(ctx, style, () => {
+    ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
+  });
+};
+
+// Draw line with semantic parameters and styling
+export const drawStyledLine = (
+  ctx: CanvasRenderingContext2D,
+  from: Pt,
+  to: Pt,
+  style: DrawingStyle
+): void => {
+  applyStyleAndDraw(ctx, style, () => {
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+  });
+};
+
+// Draw text with semantic parameters and styling
+export const drawText = (
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  position: Pt,
+  style: DrawingStyle
+): void => {
+  applyCanvasStyle(ctx, style);
+  ctx.fillText(text, position.x, position.y);
+};
+
+// Clear canvas with optional background color
+export const clearCanvas = (
+  ctx: CanvasRenderingContext2D,
+  color?: string
+): void => {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  if (color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   }
 };
