@@ -33,6 +33,7 @@ describe('Turtle Graphics Integration', () => {
         lineCap: 'butt',
         lineJoin: 'miter',
       }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     canvas = new Canvas(mockElement, { width: 400, height: 300 });
