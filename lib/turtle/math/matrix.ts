@@ -3,10 +3,10 @@
  */
 
 export type Matrix4x4 = [
-  number, number, number, number,
-  number, number, number, number,
-  number, number, number, number,
-  number, number, number, number
+  number, number, number, number, // row 1
+  number, number, number, number, // row 2
+  number, number, number, number, // row 3
+  number, number, number, number, // row 4
 ];
 
 export class Matrix4 {
@@ -18,10 +18,10 @@ export class Matrix4 {
 
   static identity(): Matrix4 {
     return new Matrix4([
-      1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1
+      1, 0, 0, 0, // row 1
+      0, 1, 0, 0, // row 2
+      0, 0, 1, 0, // row 3
+      0, 0, 0, 1, // row 4
     ]);
   }
 
