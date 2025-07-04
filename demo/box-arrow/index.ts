@@ -19,6 +19,9 @@ import {
   getQuadBezierBoxIntersection,
   calculateCurveControlPoint,
   getTangentAtQuadBezierEnd,
+  magnitude,
+  direction,
+  normalize,
 } from '../../lib/geom';
 
 // Create initial model @demo
@@ -232,28 +235,17 @@ function init() {
         ctx.stroke();
 
         // Calculate direction at the end of the curve for arrowhead
-        let direction: Vec = getTangentAtQuadBezierEnd(bezierCurve);
+        let arrowDirection: Vec = getTangentAtQuadBezierEnd(bezierCurve);
 
         // Safety check: if direction is zero or very small, fall back to straight line direction
-        const directionMagnitude = Math.sqrt(
-          direction.dx * direction.dx + direction.dy * direction.dy
-        );
+        const directionMagnitude = magnitude(arrowDirection);
         if (directionMagnitude < 0.1) {
-          const fallbackDirection: Vec = {
-            dx: toEdge.x - fromEdge.x,
-            dy: toEdge.y - fromEdge.y,
-          };
-          const fallbackMagnitude = Math.sqrt(
-            fallbackDirection.dx * fallbackDirection.dx +
-              fallbackDirection.dy * fallbackDirection.dy
-          );
+          const fallbackDirection: Vec = direction(fromEdge, toEdge);
+          const fallbackMagnitude = magnitude(fallbackDirection);
           if (fallbackMagnitude > 0) {
-            direction = {
-              dx: fallbackDirection.dx / fallbackMagnitude,
-              dy: fallbackDirection.dy / fallbackMagnitude,
-            };
+            arrowDirection = normalize(fallbackDirection);
           } else {
-            direction = { dx: 1, dy: 0 }; // Default direction
+            arrowDirection = { dx: 1, dy: 0 }; // Default direction
           }
         }
 
@@ -261,7 +253,7 @@ function init() {
         ctx.fillStyle = edge.strokeColor;
         drawArrowhead(
           ctx,
-          { origin: toEdge, direction },
+          { origin: toEdge, direction: arrowDirection },
           edge.arrowheadStyle,
           edge.arrowheadSize
         );
@@ -293,15 +285,12 @@ function init() {
         ctx.stroke();
 
         // Draw arrowhead
-        const direction: Vec = {
-          dx: toEdge.x - fromEdge.x,
-          dy: toEdge.y - fromEdge.y,
-        };
+        const arrowDirection: Vec = direction(fromEdge, toEdge);
 
         ctx.fillStyle = edge.strokeColor;
         drawArrowhead(
           ctx,
-          { origin: toEdge, direction },
+          { origin: toEdge, direction: arrowDirection },
           edge.arrowheadStyle,
           edge.arrowheadSize
         );

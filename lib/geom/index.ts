@@ -1,5 +1,30 @@
 import { Pt, Vec, Size } from '../types';
 
+// Vector utility functions
+export const midpoint = (p1: Pt, p2: Pt): Pt => ({
+  x: (p1.x + p2.x) / 2,
+  y: (p1.y + p2.y) / 2,
+});
+
+export const direction = (from: Pt, to: Pt): Vec => ({
+  dx: to.x - from.x,
+  dy: to.y - from.y,
+});
+
+export const perpendicular = (vec: Vec): Vec => ({
+  dx: vec.dy,
+  dy: -vec.dx,
+});
+
+export const magnitude = (vec: Vec): number =>
+  Math.sqrt(vec.dx * vec.dx + vec.dy * vec.dy);
+
+export const normalize = (vec: Vec): Vec => {
+  const mag = magnitude(vec);
+  if (mag === 0) return { dx: 0, dy: 0 };
+  return { dx: vec.dx / mag, dy: vec.dy / mag };
+};
+
 // Axis-aligned bounding box type
 export type AABB = {
   minX: number;
@@ -130,12 +155,11 @@ export const getBoxEdgeIntersection = (
   boxWidth: number,
   boxHeight: number
 ): Pt => {
-  const dx = seg.end.x - seg.start.x;
-  const dy = seg.end.y - seg.start.y;
+  const dir = direction(seg.start, seg.end);
 
   // Calculate intersection with each edge of the box
   const aabb = makeAABB(boxCenter, boxWidth, boxHeight);
-  const ray: Ray = { origin: seg.start, direction: { dx, dy } };
+  const ray: Ray = { origin: seg.start, direction: dir };
 
   const intersections: Pt[] = [];
   for (const edge of getEdges(aabb)) {
@@ -148,11 +172,9 @@ export const getBoxEdgeIntersection = (
   }
 
   return intersections.reduce((closest, current) => {
-    const closestDistSq =
-      Math.pow(closest.x - seg.end.x, 2) + Math.pow(closest.y - seg.end.y, 2);
-    const currentDistSq =
-      Math.pow(current.x - seg.end.x, 2) + Math.pow(current.y - seg.end.y, 2);
-    return currentDistSq < closestDistSq ? current : closest;
+    const closestDist = magnitude(direction(closest, seg.end));
+    const currentDist = magnitude(direction(current, seg.end));
+    return currentDist < closestDist ? current : closest;
   });
 };
 
@@ -301,38 +323,19 @@ export const calculateCurveControlPoint = (
   seg: LineSeg,
   curvature: number = 0.3
 ): Pt => {
-  const midX = (seg.start.x + seg.end.x) / 2;
-  const midY = (seg.start.y + seg.end.y) / 2;
+  const mid = midpoint(seg.start, seg.end);
+  const dir = direction(seg.start, seg.end);
+  const perp = perpendicular(dir);
+  const length = magnitude(dir);
 
-  // Calculate direction vector from start to end
-  const direction: Vec = {
-    dx: seg.end.x - seg.start.x,
-    dy: seg.end.y - seg.start.y,
-  };
+  if (length === 0) return mid;
 
-  // Calculate perpendicular vector (rotated 90 degrees to the right)
-  const perpendicular: Vec = {
-    dx: direction.dy, // 90 degree rotation: (dx,dy) -> (dy,-dx)
-    dy: -direction.dx,
-  };
-
-  // Normalize perpendicular vector
-  const length = Math.sqrt(
-    perpendicular.dx * perpendicular.dx + perpendicular.dy * perpendicular.dy
-  );
-  if (length === 0) return { x: midX, y: midY };
-
-  const normalizedPerpendicular: Vec = {
-    dx: perpendicular.dx / length,
-    dy: perpendicular.dy / length,
-  };
-
-  // Calculate control point offset
+  const normalizedPerp = normalize(perp);
   const offset = length * curvature;
 
   return {
-    x: midX + normalizedPerpendicular.dx * offset,
-    y: midY + normalizedPerpendicular.dy * offset,
+    x: mid.x + normalizedPerp.dx * offset,
+    y: mid.y + normalizedPerp.dy * offset,
   };
 };
 
@@ -354,15 +357,14 @@ export const getPointOnQuadBezier = (bezier: BezierQuad, t: number): Pt => {
 // Calculate tangent direction at end of quadratic Bezier curve
 export const getTangentAtQuadBezierEnd = (bezier: BezierQuad): Vec => {
   // Tangent at t=1 is 2(end - control)
-  const tangentX = 2 * (bezier.end.x - bezier.control.x);
-  const tangentY = 2 * (bezier.end.y - bezier.control.y);
+  const tangentVec = {
+    dx: 2 * (bezier.end.x - bezier.control.x),
+    dy: 2 * (bezier.end.y - bezier.control.y),
+  };
 
   // Normalize
-  const length = Math.sqrt(tangentX * tangentX + tangentY * tangentY);
+  const length = magnitude(tangentVec);
   if (length === 0) return { dx: 1, dy: 0 };
 
-  return {
-    dx: tangentX / length,
-    dy: tangentY / length,
-  };
+  return normalize(tangentVec);
 };

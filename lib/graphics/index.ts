@@ -1,5 +1,5 @@
 import { Pt } from '../types';
-import { AABB, getAABBSize, BezierQuad, Ray } from '../geom';
+import { AABB, getAABBSize, BezierQuad, Ray, normalize } from '../geom';
 
 // Animation state interface
 export interface AnimationState {
@@ -67,18 +67,36 @@ export const drawArrowhead = (
   style: 'v' | 'triangle',
   size: { width: number; length: number }
 ) => {
-  const angle = Math.atan2(ray.direction.dy, ray.direction.dx);
-  const perpAngle1 = angle + Math.PI - Math.PI / 6;
-  const perpAngle2 = angle + Math.PI + Math.PI / 6;
+  // Normalize the direction vector
+  const normalizedDir = normalize(ray.direction);
+
+  // Calculate perpendicular vector for arrowhead wings
+  const perpDir = { dx: -normalizedDir.dy, dy: normalizedDir.dx };
+
+  // Calculate wing angle (about 30 degrees from main direction)
+  const wingAngle = Math.PI / 6; // 30 degrees
+  const cos30 = Math.cos(wingAngle);
+  const sin30 = Math.sin(wingAngle);
+
+  // Calculate wing directions by rotating the main direction
+  const wing1 = {
+    dx: -normalizedDir.dx * cos30 + perpDir.dx * sin30,
+    dy: -normalizedDir.dy * cos30 + perpDir.dy * sin30,
+  };
+
+  const wing2 = {
+    dx: -normalizedDir.dx * cos30 - perpDir.dx * sin30,
+    dy: -normalizedDir.dy * cos30 - perpDir.dy * sin30,
+  };
 
   const p1 = {
-    x: ray.origin.x + Math.cos(perpAngle1) * size.length,
-    y: ray.origin.y + Math.sin(perpAngle1) * size.length,
+    x: ray.origin.x + wing1.dx * size.length,
+    y: ray.origin.y + wing1.dy * size.length,
   };
 
   const p2 = {
-    x: ray.origin.x + Math.cos(perpAngle2) * size.length,
-    y: ray.origin.y + Math.sin(perpAngle2) * size.length,
+    x: ray.origin.x + wing2.dx * size.length,
+    y: ray.origin.y + wing2.dy * size.length,
   };
 
   ctx.beginPath();
