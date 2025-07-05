@@ -150,12 +150,12 @@ class TextMeasurementDemo {
     for (const line of lines) {
       if (line.trim() === '') {
         // Measure a space to get line height for empty lines
-        const dimensions = getTextDimensions(ctx, ' ', font);
+        const dimensions = getTextDimensions({ ctx, text: ' ', font });
         totalHeight += dimensions.height;
         maxAscent = Math.max(maxAscent, dimensions.ascent);
         maxDescent = Math.max(maxDescent, dimensions.descent);
       } else {
-        const dimensions = getTextDimensions(ctx, line, font);
+        const dimensions = getTextDimensions({ ctx, text: line, font });
         maxWidth = Math.max(maxWidth, dimensions.width);
         totalHeight += dimensions.height;
         maxAscent = Math.max(maxAscent, dimensions.ascent);

@@ -227,7 +227,8 @@ function init() {
         ctx.strokeStyle = edge.strokeColor;
         ctx.lineWidth = edge.strokeThickness;
         ctx.beginPath();
-        drawCurvedEdgePath(ctx, {
+        drawCurvedEdgePath({
+          ctx,
           bezier: {
             start: fromEdge,
             control: adjustedControlPoint,
@@ -254,7 +255,8 @@ function init() {
 
         // Draw arrowhead
         ctx.fillStyle = edge.strokeColor;
-        drawArrowheadPath(ctx, {
+        drawArrowheadPath({
+          ctx,
           ray: { origin: toEdge, direction: arrowDirection },
           arrowStyle: edge.arrowheadStyle,
           size: edge.arrowheadSize,
@@ -296,7 +298,8 @@ function init() {
         const arrowDirection: Vec = direction(fromEdge, toEdge);
 
         ctx.fillStyle = edge.strokeColor;
-        drawArrowheadPath(ctx, {
+        drawArrowheadPath({
+          ctx,
           ray: { origin: toEdge, direction: arrowDirection },
           arrowStyle: edge.arrowheadStyle,
           size: edge.arrowheadSize,
@@ -360,7 +363,8 @@ function init() {
 
       // Draw box background
       ctx.fillStyle = box.fillColor;
-      drawRoundedRectPath(ctx, {
+      drawRoundedRectPath({
+        ctx,
         bounds: aabb,
         radius: box.cornerRadius,
         beginPath: true,
@@ -370,7 +374,8 @@ function init() {
       // Draw box border
       ctx.strokeStyle = box.borderColor;
       ctx.lineWidth = box.borderThickness;
-      drawRoundedRectPath(ctx, {
+      drawRoundedRectPath({
+        ctx,
         bounds: aabb,
         radius: box.cornerRadius,
         beginPath: true,

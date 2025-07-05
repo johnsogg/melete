@@ -14,14 +14,17 @@ export const easingFunctions = {
 };
 
 // Draw rounded rectangle path only
-export const drawRoundedRectPath = (
-  ctx: CanvasRenderingContext2D,
-  {
-    bounds,
-    radius,
-    beginPath,
-  }: { bounds: AABB; radius: number; beginPath: boolean }
-) => {
+export const drawRoundedRectPath = ({
+  ctx,
+  bounds,
+  radius,
+  beginPath,
+}: {
+  ctx: CanvasRenderingContext2D;
+  bounds: AABB;
+  radius: number;
+  beginPath: boolean;
+}) => {
   const { minX, minY } = bounds;
   const { width, height } = getAABBSize(bounds);
 
@@ -46,24 +49,32 @@ export const drawRoundedRectPath = (
 };
 
 // Draw rounded rectangle with semantic parameters and styling
-export const drawRoundedRect = (
-  ctx: CanvasRenderingContext2D,
-  {
-    bounds,
-    radius,
-    style,
-  }: { bounds: AABB; radius: number; style: DrawingStyle }
-): void => {
+export const drawRoundedRect = ({
+  ctx,
+  bounds,
+  radius,
+  style,
+}: {
+  ctx: CanvasRenderingContext2D;
+  bounds: AABB;
+  radius: number;
+  style: DrawingStyle;
+}): void => {
   applyStyleAndDraw(ctx, style, () => {
-    drawRoundedRectPath(ctx, { bounds, radius, beginPath: true });
+    drawRoundedRectPath({ ctx, bounds, radius, beginPath: true });
   });
 };
 
 // Draw curved edge path only using quadratic Bezier curve
-export const drawCurvedEdgePath = (
-  ctx: CanvasRenderingContext2D,
-  { bezier, beginPath }: { bezier: BezierQuad; beginPath: boolean }
-) => {
+export const drawCurvedEdgePath = ({
+  ctx,
+  bezier,
+  beginPath,
+}: {
+  ctx: CanvasRenderingContext2D;
+  bezier: BezierQuad;
+  beginPath: boolean;
+}) => {
   if (beginPath) {
     ctx.beginPath();
   }
@@ -77,30 +88,34 @@ export const drawCurvedEdgePath = (
 };
 
 // Draw curved edge with styling using quadratic Bezier curve
-export const drawCurvedEdge = (
-  ctx: CanvasRenderingContext2D,
-  { bezier, style }: { bezier: BezierQuad; style: DrawingStyle }
-): void => {
+export const drawCurvedEdge = ({
+  ctx,
+  bezier,
+  style,
+}: {
+  ctx: CanvasRenderingContext2D;
+  bezier: BezierQuad;
+  style: DrawingStyle;
+}): void => {
   applyStyleAndDraw(ctx, style, () => {
-    drawCurvedEdgePath(ctx, { bezier, beginPath: true });
+    drawCurvedEdgePath({ ctx, bezier, beginPath: true });
   });
 };
 
 // Draw arrowhead path only
-export const drawArrowheadPath = (
-  ctx: CanvasRenderingContext2D,
-  {
-    ray,
-    arrowStyle,
-    size,
-    beginPath,
-  }: {
-    ray: Ray;
-    arrowStyle: 'v' | 'triangle';
-    size: { width: number; length: number };
-    beginPath: boolean;
-  }
-) => {
+export const drawArrowheadPath = ({
+  ctx,
+  ray,
+  arrowStyle,
+  size,
+  beginPath,
+}: {
+  ctx: CanvasRenderingContext2D;
+  ray: Ray;
+  arrowStyle: 'v' | 'triangle';
+  size: { width: number; length: number };
+  beginPath: boolean;
+}) => {
   // Normalize the direction vector
   const normalizedDir = normalize(ray.direction);
 
@@ -149,33 +164,32 @@ export const drawArrowheadPath = (
 };
 
 // Draw arrowhead with styling
-export const drawArrowhead = (
-  ctx: CanvasRenderingContext2D,
-  {
-    ray,
-    arrowStyle,
-    size,
-    style,
-  }: {
-    ray: Ray;
-    arrowStyle: 'v' | 'triangle';
-    size: { width: number; length: number };
-    style: DrawingStyle;
-  }
-): void => {
+export const drawArrowhead = ({
+  ctx,
+  ray,
+  arrowStyle,
+  size,
+  style,
+}: {
+  ctx: CanvasRenderingContext2D;
+  ray: Ray;
+  arrowStyle: 'v' | 'triangle';
+  size: { width: number; length: number };
+  style: DrawingStyle;
+}): void => {
   if (arrowStyle === 'triangle') {
     applyStyleAndDraw(ctx, style, () => {
-      drawArrowheadPath(ctx, { ray, arrowStyle, size, beginPath: true });
+      drawArrowheadPath({ ctx, ray, arrowStyle, size, beginPath: true });
     });
   } else {
     applyStyleAndDraw(ctx, style, () => {
-      drawArrowheadPath(ctx, { ray, arrowStyle, size, beginPath: true });
+      drawArrowheadPath({ ctx, ray, arrowStyle, size, beginPath: true });
     });
   }
 };
 
 // Apply drawing styles to canvas context
-export const applyCanvasStyle = (
+const applyCanvasStyle = (
   ctx: CanvasRenderingContext2D,
   style: DrawingStyle
 ): void => {
@@ -197,12 +211,11 @@ export const applyCanvasStyle = (
 };
 
 // Apply styling and perform fill/stroke operations
-export const applyStyleAndDraw = (
+const applyStyleAndDraw = (
   ctx: CanvasRenderingContext2D,
   style: DrawingStyle,
   drawPath: () => void
 ): void => {
-  ctx.beginPath();
   drawPath();
 
   if (style.fill) {
@@ -217,15 +230,19 @@ export const applyStyleAndDraw = (
 };
 
 // Draw rectangle path only
-export const drawRectPath = (
-  ctx: CanvasRenderingContext2D,
-  {
-    topLeft,
-    width,
-    height,
-    beginPath,
-  }: { topLeft: Pt; width: number; height: number; beginPath: boolean }
-): void => {
+export const drawRectPath = ({
+  ctx,
+  topLeft,
+  width,
+  height,
+  beginPath,
+}: {
+  ctx: CanvasRenderingContext2D;
+  topLeft: Pt;
+  width: number;
+  height: number;
+  beginPath: boolean;
+}): void => {
   if (beginPath) {
     ctx.beginPath();
   }
@@ -233,29 +250,36 @@ export const drawRectPath = (
 };
 
 // Draw rectangle with semantic parameters and styling
-export const drawRect = (
-  ctx: CanvasRenderingContext2D,
-  {
-    topLeft,
-    width,
-    height,
-    style,
-  }: { topLeft: Pt; width: number; height: number; style: DrawingStyle }
-): void => {
+export const drawRectStyled = ({
+  ctx,
+  topLeft,
+  width,
+  height,
+  style,
+}: {
+  ctx: CanvasRenderingContext2D;
+  topLeft: Pt;
+  width: number;
+  height: number;
+  style: DrawingStyle;
+}): void => {
   applyStyleAndDraw(ctx, style, () => {
-    drawRectPath(ctx, { topLeft, width, height, beginPath: true });
+    drawRectPath({ ctx, topLeft, width, height, beginPath: true });
   });
 };
 
 // Draw circle path only
-export const drawCirclePath = (
-  ctx: CanvasRenderingContext2D,
-  {
-    center,
-    radius,
-    beginPath,
-  }: { center: Pt; radius: number; beginPath: boolean }
-): void => {
+export const drawCirclePath = ({
+  ctx,
+  center,
+  radius,
+  beginPath,
+}: {
+  ctx: CanvasRenderingContext2D;
+  center: Pt;
+  radius: number;
+  beginPath: boolean;
+}): void => {
   if (beginPath) {
     ctx.beginPath();
   }
@@ -263,20 +287,34 @@ export const drawCirclePath = (
 };
 
 // Draw circle with semantic parameters and styling
-export const drawCircle = (
-  ctx: CanvasRenderingContext2D,
-  { center, radius, style }: { center: Pt; radius: number; style: DrawingStyle }
-): void => {
+export const drawCircleStyled = ({
+  ctx,
+  center,
+  radius,
+  style,
+}: {
+  ctx: CanvasRenderingContext2D;
+  center: Pt;
+  radius: number;
+  style: DrawingStyle;
+}): void => {
   applyStyleAndDraw(ctx, style, () => {
-    drawCirclePath(ctx, { center, radius, beginPath: true });
+    drawCirclePath({ ctx, center, radius, beginPath: true });
   });
 };
 
 // Draw line path only
-export const drawLinePath = (
-  ctx: CanvasRenderingContext2D,
-  { start, end, beginPath }: { start: Pt; end: Pt; beginPath: boolean }
-): void => {
+export const drawLinePath = ({
+  ctx,
+  start,
+  end,
+  beginPath,
+}: {
+  ctx: CanvasRenderingContext2D;
+  start: Pt;
+  end: Pt;
+  beginPath: boolean;
+}): void => {
   if (beginPath) {
     ctx.beginPath();
   }
@@ -285,20 +323,32 @@ export const drawLinePath = (
 };
 
 // Draw line with semantic parameters and styling
-export const drawLine = (
-  ctx: CanvasRenderingContext2D,
-  { start, end, style }: { start: Pt; end: Pt; style: DrawingStyle }
-): void => {
+export const drawLineStyled = ({
+  ctx,
+  start,
+  end,
+  style,
+}: {
+  ctx: CanvasRenderingContext2D;
+  start: Pt;
+  end: Pt;
+  style: DrawingStyle;
+}): void => {
   applyStyleAndDraw(ctx, style, () => {
-    drawLinePath(ctx, { start, end, beginPath: true });
+    drawLinePath({ ctx, start, end, beginPath: true });
   });
 };
 
 // Draw polygon path only
-export const drawPolygonPath = (
-  ctx: CanvasRenderingContext2D,
-  { points, beginPath }: { points: Pt[]; beginPath: boolean }
-): void => {
+export const drawPolygonPath = ({
+  ctx,
+  points,
+  beginPath,
+}: {
+  ctx: CanvasRenderingContext2D;
+  points: Pt[];
+  beginPath: boolean;
+}): void => {
   if (points.length < 3) return;
 
   if (beginPath) {
@@ -312,49 +362,80 @@ export const drawPolygonPath = (
 };
 
 // Draw polygon with semantic parameters and styling
-export const drawPolygon = (
-  ctx: CanvasRenderingContext2D,
-  { points, style }: { points: Pt[]; style: DrawingStyle }
-): void => {
+export const drawPolygon = ({
+  ctx,
+  points,
+  style,
+}: {
+  ctx: CanvasRenderingContext2D;
+  points: Pt[];
+  style: DrawingStyle;
+}): void => {
   if (points.length < 3) return;
 
   applyStyleAndDraw(ctx, style, () => {
-    drawPolygonPath(ctx, { points, beginPath: true });
+    drawPolygonPath({ ctx, points, beginPath: true });
   });
 };
 
 // Draw triangle path only
-export const drawTrianglePath = (
-  ctx: CanvasRenderingContext2D,
-  { p1, p2, p3, beginPath }: { p1: Pt; p2: Pt; p3: Pt; beginPath: boolean }
-): void => {
-  drawPolygonPath(ctx, { points: [p1, p2, p3], beginPath });
+export const drawTrianglePath = ({
+  ctx,
+  p1,
+  p2,
+  p3,
+  beginPath,
+}: {
+  ctx: CanvasRenderingContext2D;
+  p1: Pt;
+  p2: Pt;
+  p3: Pt;
+  beginPath: boolean;
+}): void => {
+  drawPolygonPath({ ctx, points: [p1, p2, p3], beginPath });
 };
 
 // Draw triangle with semantic parameters and styling
-export const drawTriangle = (
-  ctx: CanvasRenderingContext2D,
-  { p1, p2, p3, style }: { p1: Pt; p2: Pt; p3: Pt; style: DrawingStyle }
-): void => {
-  drawPolygon(ctx, { points: [p1, p2, p3], style });
+export const drawTriangle = ({
+  ctx,
+  p1,
+  p2,
+  p3,
+  style,
+}: {
+  ctx: CanvasRenderingContext2D;
+  p1: Pt;
+  p2: Pt;
+  p3: Pt;
+  style: DrawingStyle;
+}): void => {
+  drawPolygon({ ctx, points: [p1, p2, p3], style });
 };
 
 // Draw text with semantic parameters and styling
-export const drawText = (
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  position: Pt,
-  style: DrawingStyle
-): void => {
+export const drawTextStyled = ({
+  ctx,
+  text,
+  position,
+  style,
+}: {
+  ctx: CanvasRenderingContext2D;
+  text: string;
+  position: Pt;
+  style: DrawingStyle;
+}): void => {
   applyCanvasStyle(ctx, style);
   ctx.fillText(text, position.x, position.y);
 };
 
 // Clear canvas with optional background color
-export const clearCanvas = (
-  ctx: CanvasRenderingContext2D,
-  color?: string
-): void => {
+export const clearCanvas = ({
+  ctx,
+  color,
+}: {
+  ctx: CanvasRenderingContext2D;
+  color?: string;
+}): void => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
   if (color) {
@@ -366,11 +447,15 @@ export const clearCanvas = (
 // Text measurement utilities
 
 // Measure text with optional font setting
-export const measureText = (
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  font?: string
-): TextMetrics => {
+export const measureText = ({
+  ctx,
+  text,
+  font,
+}: {
+  ctx: CanvasRenderingContext2D;
+  text: string;
+  font?: string;
+}): TextMetrics => {
   const originalFont = ctx.font;
   if (font) {
     ctx.font = font;
@@ -383,12 +468,16 @@ export const measureText = (
 };
 
 // Get text bounds (width and height)
-export const getTextBounds = (
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  font?: string
-): { width: number; height: number } => {
-  const metrics = measureText(ctx, text, font);
+export const getTextBounds = ({
+  ctx,
+  text,
+  font,
+}: {
+  ctx: CanvasRenderingContext2D;
+  text: string;
+  font?: string;
+}): { width: number; height: number } => {
+  const metrics = measureText({ ctx, text, font });
   const height =
     metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
   return {
@@ -398,18 +487,22 @@ export const getTextBounds = (
 };
 
 // Get comprehensive text dimensions
-export const getTextDimensions = (
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  font?: string
-): {
+export const getTextDimensions = ({
+  ctx,
+  text,
+  font,
+}: {
+  ctx: CanvasRenderingContext2D;
+  text: string;
+  font?: string;
+}): {
   width: number;
   height: number;
   baseline: number;
   ascent: number;
   descent: number;
 } => {
-  const metrics = measureText(ctx, text, font);
+  const metrics = measureText({ ctx, text, font });
   const ascent =
     metrics.actualBoundingBoxAscent || metrics.fontBoundingBoxAscent || 10;
   const descent =
@@ -425,27 +518,38 @@ export const getTextDimensions = (
 };
 
 // Center text in a rectangle
-export const centerTextInRect = (
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  rect: AABB,
-  font?: string
-): Pt => {
-  const dimensions = getTextDimensions(ctx, text, font);
+export const centerTextInRect = ({
+  ctx,
+  text,
+  rect,
+  font,
+}: {
+  ctx: CanvasRenderingContext2D;
+  text: string;
+  rect: AABB;
+  font?: string;
+}): Pt => {
+  const dimensions = getTextDimensions({ ctx, text, font });
   const centerX = (rect.minX + rect.maxX) / 2 - dimensions.width / 2;
   const centerY = (rect.minY + rect.maxY) / 2 + dimensions.baseline / 2;
   return { x: centerX, y: centerY };
 };
 
 // Align text in a box with different alignment options
-export const alignTextInBox = (
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  box: { position: Pt; width: number; height: number },
-  alignment: 'left' | 'center' | 'right',
-  font?: string
-): Pt => {
-  const dimensions = getTextDimensions(ctx, text, font);
+export const alignTextInBox = ({
+  ctx,
+  text,
+  box,
+  alignment,
+  font,
+}: {
+  ctx: CanvasRenderingContext2D;
+  text: string;
+  box: { position: Pt; width: number; height: number };
+  alignment: 'left' | 'center' | 'right';
+  font?: string;
+}): Pt => {
+  const dimensions = getTextDimensions({ ctx, text, font });
   let x = box.position.x;
 
   switch (alignment) {

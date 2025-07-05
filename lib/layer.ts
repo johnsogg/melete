@@ -10,13 +10,14 @@ import {
   DrawCircleParams,
   DrawTextParams,
   DrawLineParams,
+  Size,
 } from './geom/types';
 import { DrawingStyle } from './graphics/types';
 import {
-  drawRect as drawRectUtil,
-  drawCircle as drawCircleUtil,
-  drawLine as drawLineUtil,
-  drawText as drawTextUtil,
+  drawRectStyled,
+  drawCircleStyled,
+  drawLineStyled,
+  drawTextStyled,
   clearCanvas,
   measureText as measureTextUtil,
   getTextBounds as getTextBoundsUtil,
@@ -311,7 +312,8 @@ export class DrawingLayer<T> {
   // Semantic drawing methods
   drawRect(params: DrawRectParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
-    drawRectUtil(ctx, {
+    drawRectStyled({
+      ctx,
       topLeft: params.topLeft,
       width: params.size.width,
       height: params.size.height,
@@ -321,7 +323,8 @@ export class DrawingLayer<T> {
 
   drawCircle(params: DrawCircleParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
-    drawCircleUtil(ctx, {
+    drawCircleStyled({
+      ctx,
       center: params.center,
       radius: params.radius,
       style: params,
@@ -331,7 +334,7 @@ export class DrawingLayer<T> {
   // Clear canvas with optional background color
   clear(color?: string): void {
     const ctx = this.canvas.getContext();
-    clearCanvas(ctx, color);
+    clearCanvas({ ctx, color });
   }
 
   // Set persistent style properties
@@ -353,17 +356,18 @@ export class DrawingLayer<T> {
   drawText(params: DrawTextParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
     const mergedStyle = { ...this.persistentStyle, ...params };
-    drawTextUtil(ctx, params.text, params.position, mergedStyle);
+    drawTextStyled({
+      ctx,
+      text: params.text,
+      position: params.position,
+      style: mergedStyle,
+    });
   }
 
   // Draw line with semantic parameters
   drawLine(params: DrawLineParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
-    drawLineUtil(ctx, {
-      start: params.from,
-      end: params.to,
-      style: params,
-    });
+    drawLineStyled({ ctx, start: params.from, end: params.to, style: params });
   }
 
   // Turtle graphics method
@@ -401,15 +405,12 @@ export class DrawingLayer<T> {
   // Text measurement methods
   measureText(text: string, font?: string): TextMetrics {
     const ctx = this.canvas.getContext();
-    return measureTextUtil(ctx, text, font);
+    return measureTextUtil({ ctx, text, font });
   }
 
-  getTextBounds(
-    text: string,
-    font?: string
-  ): { width: number; height: number } {
+  getTextBounds(text: string, font?: string): Size {
     const ctx = this.canvas.getContext();
-    return getTextBoundsUtil(ctx, text, font);
+    return getTextBoundsUtil({ ctx, text, font });
   }
 
   getTextDimensions(
@@ -423,6 +424,6 @@ export class DrawingLayer<T> {
     descent: number;
   } {
     const ctx = this.canvas.getContext();
-    return getTextDimensionsUtil(ctx, text, font);
+    return getTextDimensionsUtil({ ctx, text, font });
   }
 }

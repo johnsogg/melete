@@ -107,7 +107,8 @@ mainLayer.onDemand(({ model, layer }) => {
   });
 
   // Draw a triangle using polygon function
-  drawPolygon(layer.getCanvas().getContext(), {
+  drawPolygon({
+    ctx: layer.getCanvas().getContext(),
     points: [
       { x: 300, y: 50 },
       { x: 280, y: 20 },
