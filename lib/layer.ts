@@ -10,6 +10,11 @@ import {
   DrawCircleParams,
   DrawTextParams,
   DrawLineParams,
+  DrawRoundedRectParams,
+  DrawCurvedEdgeParams,
+  DrawArrowheadParams,
+  DrawPolygonParams,
+  DrawTriangleParams,
   Size,
 } from './geom/types';
 import { DrawingStyle } from './graphics/types';
@@ -18,6 +23,11 @@ import {
   drawCircleStyled,
   drawLineStyled,
   drawTextStyled,
+  drawRoundedRectStyled,
+  drawCurvedEdgeStyled,
+  drawArrowheadStyled,
+  drawPolygonStyled,
+  drawTriangleStyled,
   clearCanvas,
   measureText as measureTextUtil,
   getTextBounds as getTextBoundsUtil,
@@ -235,7 +245,7 @@ export class DrawingLayer<T> {
           },
           getWidth: () => this.cachedCanvas!.width,
           getHeight: () => this.cachedCanvas!.height,
-          getElement: () => this.cachedCanvas as any,
+          getElement: () => this.cachedCanvas as any, // TODO: why is this any?
         };
 
         // Temporarily replace canvas with offscreen version
@@ -368,6 +378,61 @@ export class DrawingLayer<T> {
   drawLine(params: DrawLineParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
     drawLineStyled({ ctx, start: params.from, end: params.to, style: params });
+  }
+
+  // Draw rounded rectangle with semantic parameters
+  drawRoundedRect(params: DrawRoundedRectParams & DrawingStyle): void {
+    const ctx = this.canvas.getContext();
+    drawRoundedRectStyled({
+      ctx,
+      bounds: params.bounds,
+      radius: params.radius,
+      style: params,
+    });
+  }
+
+  // Draw curved edge with semantic parameters
+  drawCurvedEdge(params: DrawCurvedEdgeParams & DrawingStyle): void {
+    const ctx = this.canvas.getContext();
+    drawCurvedEdgeStyled({
+      ctx,
+      bezier: params.bezier,
+      style: params,
+    });
+  }
+
+  // Draw arrowhead with semantic parameters
+  drawArrowhead(params: DrawArrowheadParams & DrawingStyle): void {
+    const ctx = this.canvas.getContext();
+    drawArrowheadStyled({
+      ctx,
+      ray: params.ray,
+      arrowStyle: params.arrowStyle,
+      size: params.size,
+      style: params,
+    });
+  }
+
+  // Draw polygon with semantic parameters
+  drawPolygon(params: DrawPolygonParams & DrawingStyle): void {
+    const ctx = this.canvas.getContext();
+    drawPolygonStyled({
+      ctx,
+      points: params.points,
+      style: params,
+    });
+  }
+
+  // Draw triangle with semantic parameters
+  drawTriangle(params: DrawTriangleParams & DrawingStyle): void {
+    const ctx = this.canvas.getContext();
+    drawTriangleStyled({
+      ctx,
+      p1: params.p1,
+      p2: params.p2,
+      p3: params.p3,
+      style: params,
+    });
   }
 
   // Turtle graphics method

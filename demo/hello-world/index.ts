@@ -1,4 +1,4 @@
-import { DrawingSurface, drawPolygon } from '../../lib/index';
+import { DrawingSurface } from '../../lib/index';
 import { DebugPanel } from '../../lib/debug';
 
 // Define a simple model for our demo
@@ -106,18 +106,13 @@ mainLayer.onDemand(({ model, layer }) => {
     strokeColor: '#34495e',
   });
 
-  // Draw a triangle using polygon function
-  drawPolygon({
-    ctx: layer.getCanvas().getContext(),
-    points: [
-      { x: 300, y: 50 },
-      { x: 280, y: 20 },
-      { x: 320, y: 20 },
-    ],
-    style: {
-      fill: true,
-      color: '#e74c3c',
-    },
+  // Draw a triangle using DrawingLayer method
+  layer.drawTriangle({
+    p1: { x: 300, y: 50 },
+    p2: { x: 280, y: 20 },
+    p3: { x: 320, y: 20 },
+    fill: true,
+    color: '#e74c3c',
   });
 });
 

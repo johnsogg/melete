@@ -49,7 +49,7 @@ export const drawRoundedRectPath = ({
 };
 
 // Draw rounded rectangle with semantic parameters and styling
-export const drawRoundedRect = ({
+export const drawRoundedRectStyled = ({
   ctx,
   bounds,
   radius,
@@ -88,7 +88,7 @@ export const drawCurvedEdgePath = ({
 };
 
 // Draw curved edge with styling using quadratic Bezier curve
-export const drawCurvedEdge = ({
+export const drawCurvedEdgeStyled = ({
   ctx,
   bezier,
   style,
@@ -164,7 +164,7 @@ export const drawArrowheadPath = ({
 };
 
 // Draw arrowhead with styling
-export const drawArrowhead = ({
+export const drawArrowheadStyled = ({
   ctx,
   ray,
   arrowStyle,
@@ -362,7 +362,7 @@ export const drawPolygonPath = ({
 };
 
 // Draw polygon with semantic parameters and styling
-export const drawPolygon = ({
+export const drawPolygonStyled = ({
   ctx,
   points,
   style,
@@ -396,7 +396,7 @@ export const drawTrianglePath = ({
 };
 
 // Draw triangle with semantic parameters and styling
-export const drawTriangle = ({
+export const drawTriangleStyled = ({
   ctx,
   p1,
   p2,
@@ -409,7 +409,7 @@ export const drawTriangle = ({
   p3: Pt;
   style: DrawingStyle;
 }): void => {
-  drawPolygon({ ctx, points: [p1, p2, p3], style });
+  drawPolygonStyled({ ctx, points: [p1, p2, p3], style });
 };
 
 // Draw text with semantic parameters and styling

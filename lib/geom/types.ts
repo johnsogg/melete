@@ -75,3 +75,28 @@ export interface DrawLineParams {
   from: Pt;
   to: Pt;
 }
+
+export interface DrawRoundedRectParams {
+  bounds: AABB;
+  radius: number;
+}
+
+export interface DrawCurvedEdgeParams {
+  bezier: BezierQuad;
+}
+
+export interface DrawArrowheadParams {
+  ray: Ray;
+  arrowStyle: 'v' | 'triangle';
+  size: { width: number; length: number };
+}
+
+export interface DrawPolygonParams {
+  points: Pt[];
+}
+
+export interface DrawTriangleParams {
+  p1: Pt;
+  p2: Pt;
+  p3: Pt;
+}
