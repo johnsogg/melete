@@ -397,12 +397,18 @@ export class DrawingLayer<T = any> {
     return measureTextUtil(ctx, text, font);
   }
 
-  getTextBounds(text: string, font?: string): { width: number; height: number } {
+  getTextBounds(
+    text: string,
+    font?: string
+  ): { width: number; height: number } {
     const ctx = this.canvas.getContext();
     return getTextBoundsUtil(ctx, text, font);
   }
 
-  getTextDimensions(text: string, font?: string): {
+  getTextDimensions(
+    text: string,
+    font?: string
+  ): {
     width: number;
     height: number;
     baseline: number;

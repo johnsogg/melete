@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Binary Search Tree - Melete Demo</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+      
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: 'Lato', sans-serif;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+      canvas {
+        border: 1px solid #ccc;
+        display: block;
+        margin: 20px 0;
+      }
+      #canvas-container {
+        display: flex;
+        justify-content: center;
+      }
+      .demo-section {
+        margin: 20px 0;
+      }
+      .controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 20px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+      .controls input {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        width: 100px;
+      }
+      .controls button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .controls button.insert {
+        background: #28a745;
+        color: white;
+      }
+      .controls button.insert:hover {
+        background: #218838;
+      }
+      .controls button.clear {
+        background: #dc3545;
+        color: white;
+      }
+      .controls button.clear:hover {
+        background: #c82333;
+      }
+      .controls button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .error {
+        color: #dc3545;
+        font-size: 14px;
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Interactive Binary Search Tree Demo</h1>
+      
+      <div class="demo-section">
+        <p>
+          This demo showcases an interactive binary search tree visualization with smooth animations.
+          Enter numbers to insert into the tree and watch as it maintains the BST property with 
+          proper left/right positioning and animated insertions.
+        </p>
+        <p>
+          Features demonstrated:
+        </p>
+        <ul>
+          <li>Interactive BST with number input validation</li>
+          <li>Canvas visualization with proper tree layout</li>
+          <li>Smooth animations for node insertions</li>
+          <li>Layer-based y-positioning by tree depth</li>
+          <li>Placeholder spaces for missing children (educational clarity)</li>
+          <li>Real-time tree structure updates</li>
+        </ul>
+      </div>
+
+      <div class="controls">
+        <label for="numberInput">Enter number:</label>
+        <input type="number" id="numberInput" placeholder="e.g. 42" min="-999" max="999" />
+        <button class="insert" id="insertBtn">Insert</button>
+        <button class="clear" id="clearBtn">Clear Tree</button>
+        <span class="error" id="errorMsg"></span>
+      </div>
+
+      <div id="canvas-container"></div>
+      
+      <div id="debug-info"></div>
+
+      <div class="demo-section">
+        <p>
+          The BST maintains the invariant that all values in the left subtree are less than 
+          the parent node, and all values in the right subtree are greater. Watch how the 
+          tree automatically balances its structure as you add new values!
+        </p>
+        <p>
+          <a href="../index.html">← Back to Demo Index</a>
+        </p>
+      </div>
+    </div>
+
+    <script type="module" src="./index.ts"></script>
+  </body>
+</html>
