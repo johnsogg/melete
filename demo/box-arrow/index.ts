@@ -9,9 +9,9 @@ import {
 } from '../../lib/models/boxarrow';
 import {
   easingFunctions,
-  drawRoundedRect,
-  drawCurvedEdge,
-  drawArrowhead,
+  drawRoundedRectPath,
+  drawCurvedEdgePath,
+  drawArrowheadPath,
 } from '../../lib/graphics';
 import {
   getRandomPosition,
@@ -227,10 +227,13 @@ function init() {
         ctx.strokeStyle = edge.strokeColor;
         ctx.lineWidth = edge.strokeThickness;
         ctx.beginPath();
-        drawCurvedEdge(ctx, {
-          start: fromEdge,
-          control: adjustedControlPoint,
-          end: toEdge,
+        drawCurvedEdgePath(ctx, {
+          bezier: {
+            start: fromEdge,
+            control: adjustedControlPoint,
+            end: toEdge,
+          },
+          beginPath: false,
         });
         ctx.stroke();
 
@@ -251,12 +254,17 @@ function init() {
 
         // Draw arrowhead
         ctx.fillStyle = edge.strokeColor;
-        drawArrowhead(
-          ctx,
-          { origin: toEdge, direction: arrowDirection },
-          edge.arrowheadStyle,
-          edge.arrowheadSize
-        );
+        drawArrowheadPath(ctx, {
+          ray: { origin: toEdge, direction: arrowDirection },
+          arrowStyle: edge.arrowheadStyle,
+          size: edge.arrowheadSize,
+          beginPath: true,
+        });
+        if (edge.arrowheadStyle === 'triangle') {
+          ctx.fill();
+        } else {
+          ctx.stroke();
+        }
       } else {
         // For single-direction edges, draw straight lines
         const fromCenter = fromBox.position;
@@ -288,12 +296,17 @@ function init() {
         const arrowDirection: Vec = direction(fromEdge, toEdge);
 
         ctx.fillStyle = edge.strokeColor;
-        drawArrowhead(
-          ctx,
-          { origin: toEdge, direction: arrowDirection },
-          edge.arrowheadStyle,
-          edge.arrowheadSize
-        );
+        drawArrowheadPath(ctx, {
+          ray: { origin: toEdge, direction: arrowDirection },
+          arrowStyle: edge.arrowheadStyle,
+          size: edge.arrowheadSize,
+          beginPath: true,
+        });
+        if (edge.arrowheadStyle === 'triangle') {
+          ctx.fill();
+        } else {
+          ctx.stroke();
+        }
       }
     });
   });
@@ -347,13 +360,21 @@ function init() {
 
       // Draw box background
       ctx.fillStyle = box.fillColor;
-      drawRoundedRect(ctx, aabb, box.cornerRadius);
+      drawRoundedRectPath(ctx, {
+        bounds: aabb,
+        radius: box.cornerRadius,
+        beginPath: true,
+      });
       ctx.fill();
 
       // Draw box border
       ctx.strokeStyle = box.borderColor;
       ctx.lineWidth = box.borderThickness;
-      drawRoundedRect(ctx, aabb, box.cornerRadius);
+      drawRoundedRectPath(ctx, {
+        bounds: aabb,
+        radius: box.cornerRadius,
+        beginPath: true,
+      });
       ctx.stroke();
 
       // Draw text

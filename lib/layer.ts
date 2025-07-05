@@ -15,7 +15,7 @@ import { DrawingStyle } from './graphics/types';
 import {
   drawRect as drawRectUtil,
   drawCircle as drawCircleUtil,
-  drawStyledLine as drawLineUtil,
+  drawLine as drawLineUtil,
   drawText as drawTextUtil,
   clearCanvas,
   measureText as measureTextUtil,
@@ -311,18 +311,21 @@ export class DrawingLayer<T> {
   // Semantic drawing methods
   drawRect(params: DrawRectParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
-    drawRectUtil(
-      ctx,
-      params.topLeft,
-      params.size.width,
-      params.size.height,
-      params
-    );
+    drawRectUtil(ctx, {
+      topLeft: params.topLeft,
+      width: params.size.width,
+      height: params.size.height,
+      style: params,
+    });
   }
 
   drawCircle(params: DrawCircleParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
-    drawCircleUtil(ctx, params.center, params.radius, params);
+    drawCircleUtil(ctx, {
+      center: params.center,
+      radius: params.radius,
+      style: params,
+    });
   }
 
   // Clear canvas with optional background color
@@ -356,7 +359,11 @@ export class DrawingLayer<T> {
   // Draw line with semantic parameters
   drawLine(params: DrawLineParams & DrawingStyle): void {
     const ctx = this.canvas.getContext();
-    drawLineUtil(ctx, params.from, params.to, params);
+    drawLineUtil(ctx, {
+      start: params.from,
+      end: params.to,
+      style: params,
+    });
   }
 
   // Turtle graphics method

@@ -106,17 +106,18 @@ mainLayer.onDemand(({ model, layer }) => {
     strokeColor: '#34495e',
   });
 
-  // Draw a triangle using polygon function (keep this as-is for now)
-  drawPolygon(
-    layer.getCanvas(),
-    [
+  // Draw a triangle using polygon function
+  drawPolygon(layer.getCanvas().getContext(), {
+    points: [
       { x: 300, y: 50 },
       { x: 280, y: 20 },
       { x: 320, y: 20 },
     ],
-    true,
-    '#e74c3c'
-  );
+    style: {
+      fill: true,
+      color: '#e74c3c',
+    },
+  });
 });
 
 // Set up click interaction to toggle the circle
