@@ -18,6 +18,9 @@ import {
   drawStyledLine as drawLineUtil,
   drawText as drawTextUtil,
   clearCanvas,
+  measureText as measureTextUtil,
+  getTextBounds as getTextBoundsUtil,
+  getTextDimensions as getTextDimensionsUtil,
 } from './graphics';
 import {
   TurtleCommand,
@@ -386,5 +389,27 @@ export class DrawingLayer<T = any> {
     renderTurtlePath(ctx, path, style);
 
     return finalState;
+  }
+
+  // Text measurement methods
+  measureText(text: string, font?: string): TextMetrics {
+    const ctx = this.canvas.getContext();
+    return measureTextUtil(ctx, text, font);
+  }
+
+  getTextBounds(text: string, font?: string): { width: number; height: number } {
+    const ctx = this.canvas.getContext();
+    return getTextBoundsUtil(ctx, text, font);
+  }
+
+  getTextDimensions(text: string, font?: string): {
+    width: number;
+    height: number;
+    baseline: number;
+    ascent: number;
+    descent: number;
+  } {
+    const ctx = this.canvas.getContext();
+    return getTextDimensionsUtil(ctx, text, font);
   }
 }

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Measurement Demo - Melete</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        select {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .metrics {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e8f4fd;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        .metrics h3 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+        .metric-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .metric-value {
+            font-family: 'Courier New', monospace;
+            color: #28a745;
+        }
+        canvas {
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            display: block;
+            margin: 0 auto;
+        }
+        .canvas-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Measurement Demo</h1>
+        <p>Type text below to see real-time measurements and canvas rendering. Supports empty strings, emoji, multi-line text, and special characters.</p>
+        
+        <div class="controls">
+            <div class="input-group">
+                <label for="textInput">Text to measure:</label>
+                <textarea id="textInput" placeholder="Type some text here... Try emoji 🎉, newlines, or empty text!">Hello, World! 🌍
+This is a multi-line text example.
+With emoji and special chars: àáâãäå</textarea>
+            </div>
+            
+            <div class="input-group">
+                <label for="fontSelect">Font:</label>
+                <select id="fontSelect">
+                    <option value="16px Arial">16px Arial</option>
+                    <option value="24px Arial" selected>24px Arial</option>
+                    <option value="32px Arial">32px Arial</option>
+                    <option value="16px 'Courier New'">16px Courier New</option>
+                    <option value="24px 'Courier New'">24px Courier New</option>
+                    <option value="20px serif">20px Serif</option>
+                    <option value="20px sans-serif">20px Sans-serif</option>
+                    <option value="bold 24px Arial">Bold 24px Arial</option>
+                    <option value="italic 24px Arial">Italic 24px Arial</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="metrics" id="metrics">
+            <h3>Text Metrics</h3>
+            <div id="metricsContent">
+                <!-- Metrics will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="canvas-container" id="canvas-container">
+        </div>
+    </div>
+    
+    <script type="module" src="./index.ts"></script>
+</body>
+</html>

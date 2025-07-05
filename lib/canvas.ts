@@ -81,6 +81,20 @@ export class Canvas {
   getElement(): HTMLCanvasElement {
     return this.canvas;
   }
+
+  // Text measurement methods
+  measureText(text: string): TextMetrics {
+    return this.ctx.measureText(text);
+  }
+
+  getTextWidth(text: string): number {
+    return this.ctx.measureText(text).width;
+  }
+
+  getTextHeight(text: string): number {
+    const metrics = this.ctx.measureText(text);
+    return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent || 12;
+  }
 }
 
 export function createCanvas(
