@@ -16,7 +16,7 @@ export interface MeleteMouseEvent {
 
 export type MouseEventHandler = (event: MeleteMouseEvent) => void;
 
-export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
+export class DrawingSurface<T, S extends LayerSchema = LayerSchema> {
   private model: T;
   private layerSchema: S;
   private canvas: Canvas;
@@ -190,6 +190,11 @@ export class DrawingSurface<T = any, S extends LayerSchema = LayerSchema> {
   // Get all layer names in render order
   getLayerNames(): (keyof S)[] {
     return Object.keys(this.layerSchema) as (keyof S)[];
+  }
+
+  // Get the total number of layers
+  countLayers(): number {
+    return Object.keys(this.layerSchema).length;
   }
 
   // Animation methods

@@ -20,7 +20,7 @@ export interface DebugPanelOptions {
   expandedByDefault?: boolean;
 }
 
-export class DebugPanel<T = any, S extends LayerSchema = LayerSchema> {
+export class DebugPanel<T, S extends LayerSchema = LayerSchema> {
   private surface: DrawingSurface<T, S>;
   private container: HTMLElement;
   private eventHistory: DebugEvent[] = [];
@@ -524,8 +524,8 @@ export class DebugPanel<T = any, S extends LayerSchema = LayerSchema> {
 
     sizeElement.textContent = `${canvasElement.width}×${canvasElement.height}`;
 
-    // Count layers by checking the layer schema
-    const layerCount = Object.keys((this.surface as any).layerSchema).length;
+    // Count layers using the public method
+    const layerCount = this.surface.countLayers();
     layerCountElement.textContent = layerCount.toString();
   }
 

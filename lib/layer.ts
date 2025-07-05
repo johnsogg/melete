@@ -30,7 +30,7 @@ import {
   executeTurtleSequence,
 } from './turtle';
 
-export class DrawingLayer<T = any> {
+export class DrawingLayer<T> {
   private config: LayerConfig;
   private onDemandCallback?: LayerOnDemandCallback<T>;
   private onTickCallback?: LayerOnTickCallback<T>;

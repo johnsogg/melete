@@ -13,7 +13,7 @@ import {
 
 describe('Turtle Graphics Integration', () => {
   let canvas: Canvas;
-  let layer: DrawingLayer;
+  let layer: DrawingLayer<Record<string, unknown>>;
 
   beforeEach(() => {
     // Mock canvas for testing

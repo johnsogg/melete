@@ -239,7 +239,9 @@ class TextMeasurementDemo {
     `;
   }
 
-  private drawGrid(layer: import('../../lib/layer').DrawingLayer): void {
+  private drawGrid(
+    layer: import('../../lib/layer').DrawingLayer<DemoModel>
+  ): void {
     const gridSize = 50;
     const width = 800;
     const height = 600;
@@ -267,7 +269,7 @@ class TextMeasurementDemo {
   }
 
   private drawTextWithMeasurements(
-    layer: import('../../lib/layer').DrawingLayer,
+    layer: import('../../lib/layer').DrawingLayer<DemoModel>,
     text: string,
     font: string,
     metrics: TextMetrics

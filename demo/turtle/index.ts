@@ -133,7 +133,11 @@ mainLayer.onDemand(({ model, layer }) => {
   }
 });
 
-function drawSquareTurtle(layer: DrawingLayer, x: number, y: number): void {
+function drawSquareTurtle(
+  layer: DrawingLayer<TurtleModel>,
+  x: number,
+  y: number
+): void {
   const initialState = new TurtleState({ x, y, z: 0 });
 
   layer.turtle(
@@ -157,7 +161,11 @@ function drawSquareTurtle(layer: DrawingLayer, x: number, y: number): void {
   );
 }
 
-function drawTriangleTurtle(layer: DrawingLayer, x: number, y: number): void {
+function drawTriangleTurtle(
+  layer: DrawingLayer<TurtleModel>,
+  x: number,
+  y: number
+): void {
   const initialState = new TurtleState({ x, y, z: 0 });
 
   layer.turtle(
@@ -179,7 +187,11 @@ function drawTriangleTurtle(layer: DrawingLayer, x: number, y: number): void {
   );
 }
 
-function drawSpiralTurtle(layer: DrawingLayer, x: number, y: number): void {
+function drawSpiralTurtle(
+  layer: DrawingLayer<TurtleModel>,
+  x: number,
+  y: number
+): void {
   const initialState = new TurtleState({ x, y, z: 0 });
   const commands: TurtleCommand[] = [turtleAngleUnits('degrees')];
 
@@ -198,7 +210,11 @@ function drawSpiralTurtle(layer: DrawingLayer, x: number, y: number): void {
   });
 }
 
-function drawFlowerTurtle(layer: DrawingLayer, x: number, y: number): void {
+function drawFlowerTurtle(
+  layer: DrawingLayer<TurtleModel>,
+  x: number,
+  y: number
+): void {
   const initialState = new TurtleState({ x, y, z: 0 });
 
   // Draw 8 petals
@@ -226,7 +242,11 @@ function drawFlowerTurtle(layer: DrawingLayer, x: number, y: number): void {
   });
 }
 
-function drawTreeTurtle(layer: DrawingLayer, x: number, y: number): void {
+function drawTreeTurtle(
+  layer: DrawingLayer<TurtleModel>,
+  x: number,
+  y: number
+): void {
   const initialState = new TurtleState({ x, y, z: 0 });
 
   const commands = [
@@ -271,7 +291,7 @@ function drawTreeTurtle(layer: DrawingLayer, x: number, y: number): void {
 }
 
 function drawFractalTreeTurtle(
-  layer: DrawingLayer,
+  layer: DrawingLayer<TurtleModel>,
   x: number,
   y: number
 ): void {
