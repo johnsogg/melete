@@ -22,7 +22,12 @@ interface BSTModel {
   isAnimating: boolean;
   lastInsertedNode: BSTNode | null;
   selectedNode: BSTNode | null;
+  selectedNodes: Set<BSTNode>;
   animationSpeed: number;
+  isDragging: boolean;
+  dragStart: { x: number; y: number } | null;
+  dragEnd: { x: number; y: number } | null;
+  justFinishedDragging: boolean;
 }
 
 // Layer schema
@@ -42,7 +47,12 @@ const model: BSTModel = {
   isAnimating: false,
   lastInsertedNode: null,
   selectedNode: null,
+  selectedNodes: new Set<BSTNode>(),
   animationSpeed: 0.15,
+  isDragging: false,
+  dragStart: null,
+  dragEnd: null,
+  justFinishedDragging: false,
 };
 
 // Get container element
@@ -130,7 +140,8 @@ treeLayer.onDemand(({ model, layer }) => {
     if (!nodeVisData) return;
 
     const isHighlighted = node === model.lastInsertedNode;
-    const isSelected = node === model.selectedNode;
+    const isSelected = model.selectedNodes.has(node);
+
 
     // Node circle
     layer.drawCircle({
@@ -172,6 +183,25 @@ treeLayer.onDemand(({ model, layer }) => {
     });
   });
 
+  // Draw selection rectangle if dragging
+  if (model.isDragging && model.dragStart && model.dragEnd) {
+    const x1 = Math.min(model.dragStart.x, model.dragEnd.x);
+    const y1 = Math.min(model.dragStart.y, model.dragEnd.y);
+    const x2 = Math.max(model.dragStart.x, model.dragEnd.x);
+    const y2 = Math.max(model.dragStart.y, model.dragEnd.y);
+
+    // Draw selection rectangle
+    layer.drawRect({
+      topLeft: { x: x1, y: y1 },
+      size: { width: x2 - x1, height: y2 - y1 },
+      fill: true,
+      color: 'rgba(0, 123, 255, 0.1)',
+      stroke: true,
+      strokeColor: '#007bff',
+      strokeThickness: 1,
+    });
+  }
+
   // Placeholder indicators disabled - they were creating visual clutter
 });
 
@@ -203,7 +233,7 @@ const updateTreeVisualization = (): void => {
 
 const updateDeleteButtonState = (): void => {
   const currentModel = surface.getModel();
-  deleteBtn.disabled = !currentModel.selectedNode;
+  deleteBtn.disabled = currentModel.selectedNodes.size === 0;
 };
 
 // Insert button handler
@@ -247,29 +277,42 @@ insertBtn.addEventListener('click', () => {
 deleteBtn.addEventListener('click', () => {
   const currentModel = surface.getModel();
 
-  if (!currentModel.selectedNode) {
-    showError('Please select a node to delete by clicking on it');
+  if (currentModel.selectedNodes.size === 0) {
+    showError(
+      'Please select nodes to delete by clicking on them or using band selection'
+    );
     return;
   }
 
-  const valueToDelete = currentModel.selectedNode.value;
-  const success = currentModel.bst.removeValue(valueToDelete);
+  // Delete all selected nodes
+  const nodesToDelete = Array.from(currentModel.selectedNodes);
+  let deletedCount = 0;
 
-  if (!success) {
-    showError('Failed to delete node - value not found');
+  nodesToDelete.forEach(node => {
+    const success = currentModel.bst.removeValue(node.value);
+    if (success) {
+      deletedCount++;
+    }
+  });
+
+  if (deletedCount === 0) {
+    showError('Failed to delete any nodes');
     return;
   }
 
   // Clean up visualization data for deleted nodes
   cleanupVisualizationData(currentModel.bst, currentModel.visualData);
 
+  // Clear all selection state
   surface.setModel({
     ...currentModel,
     selectedNode: null,
+    selectedNodes: new Set<BSTNode>(),
     lastInsertedNode: null,
   });
 
   updateTreeVisualization();
+  updateDeleteButtonState();
 });
 
 // Clear button handler
@@ -282,6 +325,7 @@ clearBtn.addEventListener('click', () => {
     ...currentModel,
     lastInsertedNode: null,
     selectedNode: null,
+    selectedNodes: new Set<BSTNode>(),
   });
 
   surface.rerender();
@@ -296,7 +340,19 @@ numberInput.addEventListener('keypress', e => {
 
 // Canvas click handler for node selection
 surface.onClick(event => {
+  console.log('Click handler called');
   const currentModel = surface.getModel();
+
+  // Don't handle clicks if we just finished dragging
+  if (currentModel.isDragging || currentModel.justFinishedDragging) {
+    console.log('Ignoring click because of drag operation');
+    // Clear the flag and return
+    surface.setModel({
+      ...currentModel,
+      justFinishedDragging: false,
+    });
+    return;
+  }
 
   // Use the new hit testing system
   const hitResult = surface.findFirstObjectAtMouseEvent(event);
@@ -309,25 +365,171 @@ surface.onClick(event => {
       .find(node => node.id === nodeId);
 
     if (clickedNode) {
+      // Toggle node selection using Set-based approach
+      const newSelectedNodes = new Set(currentModel.selectedNodes);
+
+
+      if (newSelectedNodes.has(clickedNode)) {
+        newSelectedNodes.delete(clickedNode);
+      } else {
+        newSelectedNodes.add(clickedNode);
+      }
+
+      // Set primary selected node to the clicked node (if selected) or null
+      const newSelectedNode = newSelectedNodes.has(clickedNode)
+        ? clickedNode
+        : null;
+
+
       surface.setModel({
         ...currentModel,
-        selectedNode:
-          clickedNode === currentModel.selectedNode ? null : clickedNode,
+        selectedNode: newSelectedNode,
+        selectedNodes: newSelectedNodes,
       });
     }
   } else {
-    // Click on empty space - deselect
+    // Click on empty space - deselect all
     surface.setModel({
       ...currentModel,
       selectedNode: null,
+      selectedNodes: new Set<BSTNode>(),
     });
   }
 
   updateDeleteButtonState();
 });
 
+// Get canvas element for direct event handling
+const canvasElement = surface.getCanvas().getElement() as HTMLCanvasElement;
+
+// Mouse down handler - start drag selection
+canvasElement.addEventListener('mousedown', (event: Event) => {
+  const mouseEvent = event as MouseEvent;
+  const currentModel = surface.getModel();
+  const rect = canvasElement.getBoundingClientRect();
+  const mouseX = mouseEvent.clientX - rect.left;
+  const mouseY = mouseEvent.clientY - rect.top;
+
+  // Create a mock MeleteMouseEvent for hit testing
+  const mockEvent = {
+    canvasX: mouseX,
+    canvasY: mouseY,
+    button: mouseEvent.button,
+    shiftKey: mouseEvent.shiftKey,
+    ctrlKey: mouseEvent.ctrlKey,
+    altKey: mouseEvent.altKey,
+    metaKey: mouseEvent.metaKey,
+    rawEvent: mouseEvent,
+  };
+
+  // Don't start drag if clicking on a node
+  const hitResult = surface.findFirstObjectAtMouseEvent(mockEvent);
+  if (hitResult && hitResult.layerName === 'tree') {
+    return;
+  }
+
+  surface.setModel({
+    ...currentModel,
+    isDragging: true,
+    dragStart: { x: mouseX, y: mouseY },
+    dragEnd: { x: mouseX, y: mouseY },
+  });
+});
+
+// Mouse move handler - update drag selection
+canvasElement.addEventListener('mousemove', (event: Event) => {
+  const mouseEvent = event as MouseEvent;
+  const currentModel = surface.getModel();
+
+  if (!currentModel.isDragging || !currentModel.dragStart) {
+    return;
+  }
+
+  const rect = canvasElement.getBoundingClientRect();
+  const mouseX = mouseEvent.clientX - rect.left;
+  const mouseY = mouseEvent.clientY - rect.top;
+
+  surface.setModel({
+    ...currentModel,
+    dragEnd: { x: mouseX, y: mouseY },
+  });
+
+  surface.rerender();
+});
+
+// Mouse up handler - complete drag selection
+canvasElement.addEventListener('mouseup', (_event: Event) => {
+  const currentModel = surface.getModel();
+
+  if (
+    !currentModel.isDragging ||
+    !currentModel.dragStart ||
+    !currentModel.dragEnd
+  ) {
+    return;
+  }
+
+  // Calculate selection rectangle
+  const x1 = Math.min(currentModel.dragStart.x, currentModel.dragEnd.x);
+  const y1 = Math.min(currentModel.dragStart.y, currentModel.dragEnd.y);
+  const x2 = Math.max(currentModel.dragStart.x, currentModel.dragEnd.x);
+  const y2 = Math.max(currentModel.dragStart.y, currentModel.dragEnd.y);
+
+  // Find nodes that intersect with the selection rectangle
+  const selectedNodes = new Set<BSTNode>();
+
+  currentModel.bst.getAllNodes().forEach(node => {
+    const nodeVisData = currentModel.visualData.get(node.id);
+    if (!nodeVisData) return;
+
+    // Check if node circle intersects with selection rectangle
+    const nodeX = nodeVisData.x;
+    const nodeY = nodeVisData.y;
+    const radius = NODE_RADIUS;
+
+    // Rectangle-circle intersection test
+    const closestX = Math.max(x1, Math.min(nodeX, x2));
+    const closestY = Math.max(y1, Math.min(nodeY, y2));
+    const distanceX = nodeX - closestX;
+    const distanceY = nodeY - closestY;
+    const distanceSquared = distanceX * distanceX + distanceY * distanceY;
+
+
+    if (distanceSquared <= radius * radius) {
+      selectedNodes.add(node);
+    }
+  });
+
+  // Set primary selected node to the first selected node or null
+  const primarySelectedNode =
+    selectedNodes.size > 0 ? Array.from(selectedNodes)[0] : null;
+
+
+  console.log('Setting model with selected nodes:', Array.from(selectedNodes).map(n => n.value));
+  
+  surface.setModel({
+    ...currentModel,
+    isDragging: false,
+    dragStart: null,
+    dragEnd: null,
+    selectedNodes,
+    selectedNode: primarySelectedNode,
+    justFinishedDragging: true,
+  });
+
+  console.log('Model after update:', surface.getModel().selectedNodes.size);
+  updateDeleteButtonState();
+  surface.rerender();
+});
+
+// Initialize with some nodes
+const initialValues = [50, 25, 75, 42, 64, 98, 87, 13];
+initialValues.forEach(value => {
+  model.bst.insert(value);
+});
+
 // Initial render
-surface.rerender();
+updateTreeVisualization();
 
 // Initial UI state
 updateDeleteButtonState();
