@@ -3,7 +3,9 @@ import { DrawingStyle } from './types';
 import { drawPolygonPath } from './drawPolygon';
 import { applyStyleAndDraw } from './utils';
 
-// Draw triangle path only
+/**
+ * Draw triangle path only
+ */
 export const drawTrianglePath = ({
   ctx,
   p1,
@@ -20,7 +22,9 @@ export const drawTrianglePath = ({
   drawPolygonPath({ ctx, points: [p1, p2, p3], beginPath });
 };
 
-// Draw triangle with semantic parameters and styling
+/**
+ * Draw triangle and styling
+ */
 export const drawTriangleStyled = ({
   ctx,
   p1,

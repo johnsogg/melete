@@ -2,7 +2,9 @@ import { Ray, normalize } from '../geom';
 import { DrawingStyle } from './types';
 import { applyStyleAndDraw } from './utils';
 
-// Draw arrowhead path only
+/**
+ * Draw arrowhead path only
+ */
 export const drawArrowheadPath = ({
   ctx,
   ray,
@@ -57,13 +59,17 @@ export const drawArrowheadPath = ({
   if (arrowStyle === 'triangle') {
     ctx.lineTo(p2.x, p2.y);
     ctx.closePath();
-  } else {
+  } else if (arrowStyle === 'v') {
     ctx.moveTo(ray.origin.x, ray.origin.y);
     ctx.lineTo(p2.x, p2.y);
+  } else {
+    console.warn('Unsupported arrowhead type: ', arrowStyle);
   }
 };
 
-// Draw arrowhead with styling
+/**
+ * Draw arrowhead with styling
+ */
 export const drawArrowheadStyled = ({
   ctx,
   ray,
@@ -77,13 +83,7 @@ export const drawArrowheadStyled = ({
   size: { width: number; length: number };
   style: DrawingStyle;
 }): void => {
-  if (arrowStyle === 'triangle') {
-    applyStyleAndDraw(ctx, style, () => {
-      drawArrowheadPath({ ctx, ray, arrowStyle, size, beginPath: true });
-    });
-  } else {
-    applyStyleAndDraw(ctx, style, () => {
-      drawArrowheadPath({ ctx, ray, arrowStyle, size, beginPath: true });
-    });
-  }
+  applyStyleAndDraw(ctx, style, () => {
+    drawArrowheadPath({ ctx, ray, arrowStyle, size, beginPath: true });
+  });
 };

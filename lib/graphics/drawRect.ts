@@ -2,7 +2,9 @@ import { Pt } from '../geom';
 import { DrawingStyle } from './types';
 import { applyStyleAndDraw } from './utils';
 
-// Draw rectangle path only
+/**
+ * Draw rectangle path only
+ */
 export const drawRectPath = ({
   ctx,
   topLeft,
@@ -22,7 +24,9 @@ export const drawRectPath = ({
   ctx.rect(topLeft.x, topLeft.y, width, height);
 };
 
-// Draw rectangle with semantic parameters and styling
+/**
+ * Draw rectangle with styling
+ */
 export const drawRectStyled = ({
   ctx,
   topLeft,

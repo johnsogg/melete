@@ -2,7 +2,9 @@ import { Pt } from '../geom';
 import { DrawingStyle } from './types';
 import { applyStyleAndDraw } from './utils';
 
-// Draw line path only
+/**
+ * Draw line path only
+ */
 export const drawLinePath = ({
   ctx,
   start,
@@ -21,7 +23,9 @@ export const drawLinePath = ({
   ctx.lineTo(end.x, end.y);
 };
 
-// Draw line with semantic parameters and styling
+/**
+ * Draw line with styling
+ */
 export const drawLineStyled = ({
   ctx,
   start,

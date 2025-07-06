@@ -8,7 +8,7 @@ export { drawCirclePath, drawCircleStyled } from './drawCircle';
 export { drawLinePath, drawLineStyled } from './drawLine';
 export { drawPolygonPath, drawPolygonStyled } from './drawPolygon';
 export { drawTrianglePath, drawTriangleStyled } from './drawTriangle';
-export { drawTextStyled } from './drawText';
+export { drawTextPathBounds, drawTextStyled } from './drawText';
 export {
   measureText,
   getTextBounds,

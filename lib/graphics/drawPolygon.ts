@@ -2,7 +2,9 @@ import { Pt } from '../geom';
 import { DrawingStyle } from './types';
 import { applyStyleAndDraw } from './utils';
 
-// Draw polygon path only
+/**
+ * Draw polygon path only
+ */
 export const drawPolygonPath = ({
   ctx,
   points,
@@ -24,7 +26,9 @@ export const drawPolygonPath = ({
   ctx.closePath();
 };
 
-// Draw polygon with semantic parameters and styling
+/**
+ * Draw polygon and styling
+ */
 export const drawPolygonStyled = ({
   ctx,
   points,

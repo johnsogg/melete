@@ -2,7 +2,9 @@ import { AABB, getAABBSize } from '../geom';
 import { DrawingStyle } from './types';
 import { applyStyleAndDraw } from './utils';
 
-// Draw rounded rectangle path only
+/**
+ * Draw rounded rectangle path only
+ */
 export const drawRoundedRectPath = ({
   ctx,
   bounds,
@@ -37,7 +39,9 @@ export const drawRoundedRectPath = ({
   ctx.closePath();
 };
 
-// Draw rounded rectangle with semantic parameters and styling
+/**
+ * Draw rounded rectangle with styling
+ */
 export const drawRoundedRectStyled = ({
   ctx,
   bounds,

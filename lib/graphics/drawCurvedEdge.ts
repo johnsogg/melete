@@ -2,7 +2,9 @@ import { BezierQuad } from '../geom';
 import { DrawingStyle } from './types';
 import { applyStyleAndDraw } from './utils';
 
-// Draw curved edge path only using quadratic Bezier curve
+/**
+ * Draw curved edge path only using quadratic Bezier curve
+ */
 export const drawCurvedEdgePath = ({
   ctx,
   bezier,
@@ -24,7 +26,9 @@ export const drawCurvedEdgePath = ({
   );
 };
 
-// Draw curved edge with styling using quadratic Bezier curve
+/**
+ * Draw curved edge with styling using quadratic Bezier curve
+ */
 export const drawCurvedEdgeStyled = ({
   ctx,
   bezier,

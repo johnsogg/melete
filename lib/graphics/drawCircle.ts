@@ -2,7 +2,9 @@ import { Pt } from '../geom';
 import { DrawingStyle } from './types';
 import { applyStyleAndDraw } from './utils';
 
-// Draw circle path only
+/**
+ * Draw circle path only
+ */
 export const drawCirclePath = ({
   ctx,
   center,
@@ -20,7 +22,9 @@ export const drawCirclePath = ({
   ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
 };
 
-// Draw circle with semantic parameters and styling
+/**
+ * Draw circle with semantic parameters and styling
+ */
 export const drawCircleStyled = ({
   ctx,
   center,
