@@ -169,3 +169,28 @@ export const findNewlyInsertedNode = (
   const nodes = bst.getAllNodes();
   return nodes.find(node => !visualData.has(node.id)) || null;
 };
+
+// Find node at a specific position (for click detection)
+export const findNodeAtPosition = (
+  x: number,
+  y: number,
+  visualData: Map<string, VisualizationData>,
+  nodes: BSTNode[]
+): BSTNode | null => {
+  for (const node of nodes) {
+    const nodeVisData = visualData.get(node.id);
+    if (!nodeVisData) continue;
+
+    // Calculate distance from click to node center
+    const dx = x - nodeVisData.x;
+    const dy = y - nodeVisData.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Check if click is within the node's radius
+    if (distance <= NODE_RADIUS) {
+      return node;
+    }
+  }
+
+  return null;
+};

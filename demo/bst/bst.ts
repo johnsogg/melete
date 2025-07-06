@@ -61,6 +61,55 @@ export class BST {
     return this.searchNode(node.right, value);
   }
 
+  removeValue(value: number): boolean {
+    if (!this.search(value)) {
+      return false; // Value doesn't exist
+    }
+
+    this.root = this.removeNode(this.root, value);
+    return true;
+  }
+
+  private removeNode(node: BSTNode | null, value: number): BSTNode | null {
+    if (!node) return null;
+
+    if (value < node.value) {
+      node.left = this.removeNode(node.left, value);
+    } else if (value > node.value) {
+      node.right = this.removeNode(node.right, value);
+    } else {
+      // Found the node to delete
+
+      // Case 1: Node with no children (leaf)
+      if (!node.left && !node.right) {
+        return null;
+      }
+
+      // Case 2: Node with one child
+      if (!node.left) {
+        return node.right;
+      }
+      if (!node.right) {
+        return node.left;
+      }
+
+      // Case 3: Node with two children
+      // Find the inorder successor (smallest in right subtree)
+      const successor = this.findMin(node.right);
+      node.value = successor.value;
+      node.right = this.removeNode(node.right, successor.value);
+    }
+
+    return node;
+  }
+
+  private findMin(node: BSTNode): BSTNode {
+    while (node.left) {
+      node = node.left;
+    }
+    return node;
+  }
+
   clear(): void {
     this.root = null;
   }

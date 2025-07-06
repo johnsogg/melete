@@ -60,6 +60,17 @@
       .controls button.insert:hover {
         background: #218838;
       }
+      .controls button.delete {
+        background: #fd7e14;
+        color: white;
+      }
+      .controls button.delete:hover {
+        background: #e55a00;
+      }
+      .controls button.delete:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
       .controls button.clear {
         background: #dc3545;
         color: white;
@@ -94,9 +105,10 @@
         <ul>
           <li>Interactive BST with number input validation</li>
           <li>Canvas visualization with proper tree layout</li>
-          <li>Smooth animations for node insertions</li>
+          <li>Smooth animations for node insertions and deletions</li>
+          <li>Click-to-select nodes for deletion (red highlighting)</li>
+          <li>Complete BST deletion algorithm (leaf, one child, two children)</li>
           <li>Layer-based y-positioning by tree depth</li>
-          <li>Placeholder spaces for missing children (educational clarity)</li>
           <li>Real-time tree structure updates</li>
         </ul>
       </div>
@@ -105,6 +117,7 @@
         <label for="numberInput">Enter number:</label>
         <input type="number" id="numberInput" placeholder="e.g. 42" min="-999" max="999" />
         <button class="insert" id="insertBtn">Insert</button>
+        <button class="delete" id="deleteBtn">Delete Selected</button>
         <button class="clear" id="clearBtn">Clear Tree</button>
         <span class="error" id="errorMsg"></span>
       </div>
@@ -118,6 +131,11 @@
           The BST maintains the invariant that all values in the left subtree are less than 
           the parent node, and all values in the right subtree are greater. Watch how the 
           tree automatically balances its structure as you add new values!
+        </p>
+        <p>
+          <strong>Usage:</strong> Enter numbers to insert them into the tree. Click on any node 
+          to select it for deletion (selected nodes appear in red). Use the "Delete Selected" 
+          button to remove the selected node while maintaining the BST property.
         </p>
         <p>
           <a href="../index.html">← Back to Demo Index</a>

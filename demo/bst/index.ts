@@ -6,6 +6,8 @@ import {
   calculatePositions,
   animateNodes,
   findNewlyInsertedNode,
+  findNodeAtPosition,
+  cleanupVisualizationData,
   NODE_RADIUS,
 } from './visualization';
 
@@ -16,6 +18,7 @@ interface BSTModel {
   animationFrame: number;
   isAnimating: boolean;
   lastInsertedNode: BSTNode | null;
+  selectedNode: BSTNode | null;
   animationSpeed: number;
 }
 
@@ -35,6 +38,7 @@ const model: BSTModel = {
   animationFrame: 0,
   isAnimating: false,
   lastInsertedNode: null,
+  selectedNode: null,
   animationSpeed: 0.15,
 };
 
@@ -120,16 +124,17 @@ treeLayer.onDemand(({ model, layer }) => {
     if (!nodeVisData) return;
 
     const isHighlighted = node === model.lastInsertedNode;
+    const isSelected = node === model.selectedNode;
 
     // Node circle
     layer.drawCircle({
       center: { x: nodeVisData.x, y: nodeVisData.y },
       radius: NODE_RADIUS,
       fill: true,
-      color: isHighlighted ? '#28a745' : '#007bff',
+      color: isSelected ? '#dc3545' : isHighlighted ? '#28a745' : '#007bff',
       stroke: true,
-      strokeColor: '#333',
-      strokeThickness: 2,
+      strokeColor: isSelected ? '#721c24' : '#333',
+      strokeThickness: isSelected ? 3 : 2,
     });
 
     // Node value text - properly centered
@@ -158,6 +163,7 @@ treeLayer.onDemand(({ model, layer }) => {
 // UI Elements
 const numberInput = document.getElementById('numberInput') as HTMLInputElement;
 const insertBtn = document.getElementById('insertBtn') as HTMLButtonElement;
+const deleteBtn = document.getElementById('deleteBtn') as HTMLButtonElement;
 const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
 const errorMsg = document.getElementById('errorMsg') as HTMLSpanElement;
 
@@ -178,6 +184,11 @@ const updateTreeVisualization = (): void => {
   });
 
   requestAnimationFrame(runAnimation);
+};
+
+const updateDeleteButtonState = (): void => {
+  const currentModel = surface.getModel();
+  deleteBtn.disabled = !currentModel.selectedNode;
 };
 
 // Insert button handler
@@ -217,6 +228,35 @@ insertBtn.addEventListener('click', () => {
   updateTreeVisualization();
 });
 
+// Delete button handler
+deleteBtn.addEventListener('click', () => {
+  const currentModel = surface.getModel();
+
+  if (!currentModel.selectedNode) {
+    showError('Please select a node to delete by clicking on it');
+    return;
+  }
+
+  const valueToDelete = currentModel.selectedNode.value;
+  const success = currentModel.bst.removeValue(valueToDelete);
+
+  if (!success) {
+    showError('Failed to delete node - value not found');
+    return;
+  }
+
+  // Clean up visualization data for deleted nodes
+  cleanupVisualizationData(currentModel.bst, currentModel.visualData);
+
+  surface.setModel({
+    ...currentModel,
+    selectedNode: null,
+    lastInsertedNode: null,
+  });
+
+  updateTreeVisualization();
+});
+
 // Clear button handler
 clearBtn.addEventListener('click', () => {
   const currentModel = surface.getModel();
@@ -226,6 +266,7 @@ clearBtn.addEventListener('click', () => {
   surface.setModel({
     ...currentModel,
     lastInsertedNode: null,
+    selectedNode: null,
   });
 
   surface.rerender();
@@ -238,8 +279,40 @@ numberInput.addEventListener('keypress', e => {
   }
 });
 
+// Canvas click handler for node selection
+surface.onClick(event => {
+  const currentModel = surface.getModel();
+  const nodes = currentModel.bst.getAllNodes();
+
+  const clickedNode = findNodeAtPosition(
+    event.canvasX,
+    event.canvasY,
+    currentModel.visualData,
+    nodes
+  );
+
+  if (clickedNode) {
+    surface.setModel({
+      ...currentModel,
+      selectedNode:
+        clickedNode === currentModel.selectedNode ? null : clickedNode,
+    });
+  } else {
+    // Click on empty space - deselect
+    surface.setModel({
+      ...currentModel,
+      selectedNode: null,
+    });
+  }
+
+  updateDeleteButtonState();
+});
+
 // Initial render
 surface.rerender();
+
+// Initial UI state
+updateDeleteButtonState();
 
 // Create debug panel
 const debugContainer = document.getElementById('debug-info');
