@@ -41,6 +41,8 @@ import {
   renderTurtlePath,
   executeTurtleSequence,
 } from './turtle';
+import { HitTestRegistry, HitTestData } from './hit-test';
+import { Pt } from './geom';
 
 export class DrawingLayer<T> {
   private config: LayerConfig;
@@ -54,6 +56,9 @@ export class DrawingLayer<T> {
   private cachedCanvas: OffscreenCanvas | null = null;
   private cacheValid: boolean = false;
   private lastModelHash: string = '';
+
+  // Hit testing
+  private hitTestRegistry: HitTestRegistry = new HitTestRegistry();
 
   constructor(_name: string, config: LayerConfig, canvas: Canvas, model: T) {
     this.config = { ...config };
@@ -318,6 +323,9 @@ export class DrawingLayer<T> {
     // Clear callbacks
     this.onDemandCallback = undefined;
     this.onTickCallback = undefined;
+
+    // Clear hit test data
+    this.hitTestRegistry.clear();
   }
 
   // Semantic drawing methods
@@ -494,5 +502,40 @@ export class DrawingLayer<T> {
   } {
     const ctx = this.canvas.getContext();
     return getTextDimensionsUtil({ ctx, text, font });
+  }
+
+  // Hit testing methods (only available if layer is configured as hittable)
+  addHitTestData(data: HitTestData): void {
+    if (!this.config.hittable) {
+      console.warn(
+        'Layer is not configured as hittable. Set hittable: true in LayerConfig.'
+      );
+      return;
+    }
+    this.hitTestRegistry.add(data);
+  }
+
+  removeHitTestData(id: string): void {
+    if (!this.config.hittable) return;
+    this.hitTestRegistry.remove(id);
+  }
+
+  clearHitTestData(): void {
+    if (!this.config.hittable) return;
+    this.hitTestRegistry.clear();
+  }
+
+  findObjectsAt(point: Pt): HitTestData[] {
+    if (!this.config.hittable) return [];
+    return this.hitTestRegistry.findObjectsAt(point);
+  }
+
+  findFirstObjectAt(point: Pt): HitTestData | null {
+    if (!this.config.hittable) return null;
+    return this.hitTestRegistry.findFirstObjectAt(point);
+  }
+
+  isHittable(): boolean {
+    return this.config.hittable === true;
   }
 }

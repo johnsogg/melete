@@ -21,6 +21,7 @@ export interface LayerConfig {
   cache: boolean;
   offscreen: boolean;
   animated?: boolean;
+  hittable?: boolean;
 }
 
 export type LayerSchema = Record<string, LayerConfig>;

@@ -1,6 +1,8 @@
 import { Canvas, createCanvas } from './canvas';
 import { DrawingLayer } from './layer';
 import { DrawingSurfaceConfig, LayerSchema, CanvasOptions } from './types';
+import { HitTestData } from './hit-test';
+import { Pt } from './geom';
 
 // Event handling types
 export interface MeleteMouseEvent {
@@ -213,6 +215,66 @@ export class DrawingSurface<T, S extends LayerSchema = LayerSchema> {
       cancelAnimationFrame(this.animationId);
       this.animationId = undefined;
     }
+  }
+
+  // Hit testing methods - test layers in reverse z-order (top to bottom)
+  findObjectsAt(
+    point: Pt
+  ): Array<{ layerName: keyof S; objects: HitTestData[] }> {
+    const results: Array<{ layerName: keyof S; objects: HitTestData[] }> = [];
+
+    // Get layer names in reverse order (top layer first)
+    const layerNames = Object.keys(this.layerSchema) as (keyof S)[];
+    const reversedLayerNames = [...layerNames].reverse();
+
+    for (const layerName of reversedLayerNames) {
+      const layer = this.layers.get(layerName);
+      const isVisible = this.layerVisibility.get(layerName) ?? true;
+
+      if (layer && isVisible && layer.isHittable()) {
+        const objects = layer.findObjectsAt(point);
+        if (objects.length > 0) {
+          results.push({ layerName, objects });
+        }
+      }
+    }
+
+    return results;
+  }
+
+  findFirstObjectAt(
+    point: Pt
+  ): { layerName: keyof S; object: HitTestData } | null {
+    // Get layer names in reverse order (top layer first)
+    const layerNames = Object.keys(this.layerSchema) as (keyof S)[];
+    const reversedLayerNames = [...layerNames].reverse();
+
+    for (const layerName of reversedLayerNames) {
+      const layer = this.layers.get(layerName);
+      const isVisible = this.layerVisibility.get(layerName) ?? true;
+
+      if (layer && isVisible && layer.isHittable()) {
+        const object = layer.findFirstObjectAt(point);
+        if (object) {
+          return { layerName, object };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  // Convenience method to find objects at mouse event position
+  findObjectsAtMouseEvent(
+    event: MeleteMouseEvent
+  ): Array<{ layerName: keyof S; objects: HitTestData[] }> {
+    return this.findObjectsAt({ x: event.canvasX, y: event.canvasY });
+  }
+
+  findFirstObjectAtMouseEvent(
+    event: MeleteMouseEvent
+  ): { layerName: keyof S; object: HitTestData } | null {
+    return this.findFirstObjectAt({ x: event.canvasX, y: event.canvasY });
   }
 
   // Clean up resources

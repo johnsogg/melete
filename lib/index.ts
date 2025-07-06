@@ -23,5 +23,8 @@ export * from './graphics';
 // Geometry utilities
 export * from './geom';
 
+// Hit testing utilities
+export * from './hit-test';
+
 // Models
 export * from './models/boxarrow';

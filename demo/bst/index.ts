@@ -1,4 +1,8 @@
-import { DrawingSurface } from '../../lib/index';
+import {
+  DrawingSurface,
+  calculateAabbFromCircle,
+  pointInCircle,
+} from '../../lib/index';
 import { DebugPanel } from '../../lib/debug';
 import { BST, BSTNode } from './bst';
 import {
@@ -6,7 +10,6 @@ import {
   calculatePositions,
   animateNodes,
   findNewlyInsertedNode,
-  findNodeAtPosition,
   cleanupVisualizationData,
   NODE_RADIUS,
 } from './visualization';
@@ -25,7 +28,7 @@ interface BSTModel {
 // Layer schema
 const BST_LAYERS = {
   background: { cache: false, offscreen: false },
-  tree: { cache: false, offscreen: false },
+  tree: { cache: false, offscreen: false, hittable: true },
   animation: { cache: false, offscreen: false },
 } as const;
 
@@ -86,6 +89,9 @@ backgroundLayer.onDemand(({ layer }) => {
 const treeLayer = surface.getLayer('tree');
 treeLayer.onDemand(({ model, layer }) => {
   const nodes = model.bst.getAllNodes();
+
+  // Clear previous hit test data
+  layer.clearHitTestData();
 
   // Draw connections first
   nodes.forEach(node => {
@@ -154,6 +160,15 @@ treeLayer.onDemand(({ model, layer }) => {
     layer.drawText({
       text,
       position: { x: textX, y: textY },
+    });
+
+    // Register node for hit testing
+    const center = { x: nodeVisData.x, y: nodeVisData.y };
+    const aabb = calculateAabbFromCircle(center, NODE_RADIUS);
+    layer.addHitTestData({
+      id: node.id,
+      aabb,
+      preciseTest: point => pointInCircle(point, center, NODE_RADIUS),
     });
   });
 
@@ -282,21 +297,24 @@ numberInput.addEventListener('keypress', e => {
 // Canvas click handler for node selection
 surface.onClick(event => {
   const currentModel = surface.getModel();
-  const nodes = currentModel.bst.getAllNodes();
 
-  const clickedNode = findNodeAtPosition(
-    event.canvasX,
-    event.canvasY,
-    currentModel.visualData,
-    nodes
-  );
+  // Use the new hit testing system
+  const hitResult = surface.findFirstObjectAtMouseEvent(event);
 
-  if (clickedNode) {
-    surface.setModel({
-      ...currentModel,
-      selectedNode:
-        clickedNode === currentModel.selectedNode ? null : clickedNode,
-    });
+  if (hitResult && hitResult.layerName === 'tree') {
+    // Find the clicked node by ID
+    const nodeId = hitResult.object.id;
+    const clickedNode = currentModel.bst
+      .getAllNodes()
+      .find(node => node.id === nodeId);
+
+    if (clickedNode) {
+      surface.setModel({
+        ...currentModel,
+        selectedNode:
+          clickedNode === currentModel.selectedNode ? null : clickedNode,
+      });
+    }
   } else {
     // Click on empty space - deselect
     surface.setModel({
