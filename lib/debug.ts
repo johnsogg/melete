@@ -1,10 +1,32 @@
 import { DrawingSurface, MeleteMouseEvent } from './surface';
 import { LayerSchema } from './types';
 
-interface DebugEvent {
+// Specific event data types
+interface ClickEventData {
+  canvasX: number;
+  canvasY: number;
+  button: number;
+}
+
+interface RenderEventData {
+  renderTime: number;
+  tick?: number;
+}
+
+interface ModelUpdateEventData<T> {
+  model: T;
+}
+
+// Union type for all possible event data
+type DebugEventData<T> =
+  | ClickEventData
+  | RenderEventData
+  | ModelUpdateEventData<T>;
+
+interface DebugEvent<T = unknown> {
   type: string;
   timestamp: number;
-  data: any;
+  data: DebugEventData<T>;
 }
 
 interface PerformanceData {
@@ -23,7 +45,7 @@ export interface DebugPanelOptions {
 export class DebugPanel<T, S extends LayerSchema = LayerSchema> {
   private surface: DrawingSurface<T, S>;
   private container: HTMLElement;
-  private eventHistory: DebugEvent[] = [];
+  private eventHistory: DebugEvent<T>[] = [];
   private performanceData: PerformanceData = {
     lastRenderTime: 0,
     averageRenderTime: 0,
@@ -405,8 +427,8 @@ export class DebugPanel<T, S extends LayerSchema = LayerSchema> {
     };
   }
 
-  private addEvent(type: string, data: any): void {
-    const event: DebugEvent = {
+  private addEvent(type: string, data: DebugEventData<T>): void {
+    const event: DebugEvent<T> = {
       type,
       timestamp: Date.now(),
       data,
@@ -481,12 +503,12 @@ export class DebugPanel<T, S extends LayerSchema = LayerSchema> {
       .join('');
   }
 
-  private formatEventData(type: string, data: any): string {
+  private formatEventData(type: string, data: DebugEventData<T>): string {
     switch (type) {
       case 'click':
-        return ` at (${data.canvasX}, ${data.canvasY})`;
+        return ` at (${(data as ClickEventData).canvasX}, ${(data as ClickEventData).canvasY})`;
       case 'render':
-        return ` (${data.renderTime.toFixed(1)}ms)`;
+        return ` (${(data as RenderEventData).renderTime.toFixed(1)}ms)`;
       case 'model-update':
         return ' - model changed';
       default:

@@ -13,6 +13,9 @@ export interface CanvasOptions {
   height: number;
 }
 
+// Union type for canvas elements that can be either HTML or OffscreenCanvas
+export type CanvasElement = HTMLCanvasElement | OffscreenCanvas;
+
 // Layer system types
 export interface LayerConfig {
   cache: boolean;

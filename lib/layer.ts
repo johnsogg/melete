@@ -4,6 +4,7 @@ import {
   LayerCallbackContext,
   LayerOnDemandCallback,
   LayerOnTickCallback,
+  CanvasElement,
 } from './types';
 import {
   DrawRectParams,
@@ -245,7 +246,7 @@ export class DrawingLayer<T> {
           },
           getWidth: () => this.cachedCanvas!.width,
           getHeight: () => this.cachedCanvas!.height,
-          getElement: () => this.cachedCanvas as any, // TODO: why is this any?
+          getElement: (): CanvasElement => this.cachedCanvas!,
         };
 
         // Temporarily replace canvas with offscreen version
@@ -357,7 +358,10 @@ export class DrawingLayer<T> {
       if (value === null || value === undefined) {
         delete this.persistentStyle[styleKey];
       } else {
-        (this.persistentStyle as any)[styleKey] = value;
+        // Type-safe assignment using proper key constraint
+        (this.persistentStyle as Record<keyof DrawingStyle, unknown>)[
+          styleKey
+        ] = value;
       }
     });
   }

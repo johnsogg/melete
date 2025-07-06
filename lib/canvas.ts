@@ -1,4 +1,4 @@
-import { CanvasOptions } from './types';
+import { CanvasOptions, CanvasElement } from './types';
 import { Color, Font } from './graphics/types';
 
 export class Canvas {
@@ -78,7 +78,7 @@ export class Canvas {
     return this.ctx;
   }
 
-  getElement(): HTMLCanvasElement {
+  getElement(): CanvasElement {
     return this.canvas;
   }
 
@@ -93,7 +93,9 @@ export class Canvas {
 
   getTextHeight(text: string): number {
     const metrics = this.ctx.measureText(text);
-    return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent || 12;
+    return (
+      metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent || 12
+    );
   }
 }
 
