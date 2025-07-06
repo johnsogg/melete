@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Purpose
 
 Melete is a TypeScript graphics library for creating web-based visual content including:
+
 - Procedurally generated art
 - Interactive lecture slides for math, computer science, and graphics
 - Educational visualizations and diagrams
@@ -55,7 +56,7 @@ lib/
 ├── index.ts              # Main library exports
 ├── types.ts              # Core type definitions
 ├── canvas.ts             # Canvas management
-├── surface.ts            # Drawing surface orchestration  
+├── surface.ts            # Drawing surface orchestration
 ├── layer.ts              # Layer system implementation
 ├── debug.ts              # Debug utilities
 ├── graphics/             # Drawing primitives
@@ -93,17 +94,20 @@ demo/
 ## Key Design Patterns
 
 ### Dual API Pattern (Graphics)
+
 - `drawFooPath()`: Creates geometric paths without styling
 - `drawFooStyled()`: Applies styling and renders paths
 - Allows flexible composition and reuse
 
 ### Layer Composition
+
 - Type-safe layer schemas with `LayerSchema` interface
 - Automatic caching for static layers
 - Animation support through tick-based callbacks
 - Model-driven rendering with automatic cache invalidation
 
 ### Turtle Graphics
+
 - Immutable command sequences
 - Functional state transformations
 - Hierarchical operations with push/pop semantics
@@ -133,8 +137,8 @@ npm run check
 # Run linting with auto-fix
 npm run lint:fix
 
-# Run tests
-npm run test
+# Run tests and exit on completion
+npm run test:run
 
 # Type checking only
 npm run typecheck
@@ -143,6 +147,7 @@ npm run typecheck
 ## Development Guidelines
 
 ### Code Style
+
 - Use arrow functions whenever technically possible
 - Prefer `const` over `let`, avoid `var`
 - Use meaningful parameter object destructuring
@@ -150,18 +155,21 @@ npm run typecheck
 - Maintain strict TypeScript settings
 
 ### Testing
+
 - Write tests for all public APIs
 - Use descriptive test names
 - Test both happy path and edge cases
 - Run `npm run check` before committing
 
 ### Graphics Functions
+
 - Follow dual API pattern: path generation + styled rendering
 - Use consistent parameter object patterns
 - Include proper TypeScript types for all parameters
 - Document complex geometric operations
 
 ### Layer Development
+
 - Design layers to be composable and reusable
 - Use caching appropriately for static content
 - Separate model logic from rendering logic
@@ -170,6 +178,7 @@ npm run typecheck
 ## Project Status
 
 The library has a solid foundation with:
+
 - ✅ Complete turtle graphics system with comprehensive tests
 - ✅ Robust layer system with caching and animation
 - ✅ Full suite of graphics primitives

@@ -16,6 +16,7 @@ export {
   centerTextInRect,
   alignTextInBox,
 } from './textUtils';
+export { lerp, lerpPt, lerpVec } from './interpolation';
 
 // Easing functions
 export const easingFunctions = {

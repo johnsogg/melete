@@ -2,6 +2,7 @@
 // Handles layout calculation and animation for BST nodes
 
 import { BST, BSTNode } from './bst';
+import { lerp } from '../../lib/graphics';
 
 // Visualization constants
 export const NODE_RADIUS = 25;
@@ -17,11 +18,6 @@ export interface VisualizationData {
   targetY: number;
   isAnimating: boolean;
 }
-
-// Linear interpolation function
-export const lerp = (start: number, end: number, factor: number): number => {
-  return start + (end - start) * factor;
-};
 
 // Initialize visualization data for a new node
 export const createVisualizationData = (
