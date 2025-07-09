@@ -142,7 +142,6 @@ treeLayer.onDemand(({ model, layer }) => {
     const isHighlighted = node === model.lastInsertedNode;
     const isSelected = model.selectedNodes.has(node);
 
-
     // Node circle
     layer.drawCircle({
       center: { x: nodeVisData.x, y: nodeVisData.y },
@@ -368,7 +367,6 @@ surface.onClick(event => {
       // Toggle node selection using Set-based approach
       const newSelectedNodes = new Set(currentModel.selectedNodes);
 
-
       if (newSelectedNodes.has(clickedNode)) {
         newSelectedNodes.delete(clickedNode);
       } else {
@@ -379,7 +377,6 @@ surface.onClick(event => {
       const newSelectedNode = newSelectedNodes.has(clickedNode)
         ? clickedNode
         : null;
-
 
       surface.setModel({
         ...currentModel,
@@ -494,7 +491,6 @@ canvasElement.addEventListener('mouseup', (_event: Event) => {
     const distanceY = nodeY - closestY;
     const distanceSquared = distanceX * distanceX + distanceY * distanceY;
 
-
     if (distanceSquared <= radius * radius) {
       selectedNodes.add(node);
     }
@@ -504,9 +500,11 @@ canvasElement.addEventListener('mouseup', (_event: Event) => {
   const primarySelectedNode =
     selectedNodes.size > 0 ? Array.from(selectedNodes)[0] : null;
 
+  console.log(
+    'Setting model with selected nodes:',
+    Array.from(selectedNodes).map(n => n.value)
+  );
 
-  console.log('Setting model with selected nodes:', Array.from(selectedNodes).map(n => n.value));
-  
   surface.setModel({
     ...currentModel,
     isDragging: false,
@@ -522,8 +520,11 @@ canvasElement.addEventListener('mouseup', (_event: Event) => {
   surface.rerender();
 });
 
-// Initialize with some nodes
-const initialValues = [50, 25, 75, 42, 64, 98, 87, 13];
+// Initialize with some nodes - create a fuller tree for testing with 5 levels
+const initialValues = [
+  50, 25, 75, 13, 37, 64, 98, 6, 19, 31, 42, 58, 69, 87, 106, 3, 8, 16, 22, 28,
+  34, 39, 45, 55, 61, 67, 72, 82, 92, 102, 110,
+];
 initialValues.forEach(value => {
   model.bst.insert(value);
 });
