@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Constraints - Melete Demo</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+      
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: 'Lato', sans-serif;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .demo-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 20px;
+        margin: 20px 0;
+      }
+      #canvas-container {
+        border: 1px solid #ccc;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8f9fa;
+      }
+      #control-panel {
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #f8f9fa;
+      }
+      #output-panel {
+        grid-column: 1 / -1;
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #f8f9fa;
+        min-height: 150px;
+      }
+      .panel-title {
+        margin: 0 0 15px 0;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 8px;
+      }
+      canvas {
+        border: 1px solid #ddd;
+      }
+      .demo-section {
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Constraints Demo</h1>
+      
+      <div class="demo-section">
+        <p>
+          This demo will explore constraint-based graphics and layout systems.
+          The canvas occupies the left 2/3 of the workspace, with controls on the right
+          and output information below.
+        </p>
+      </div>
+
+      <div class="demo-grid">
+        <div id="canvas-container">
+          <!-- Canvas will be inserted here -->
+        </div>
+        
+        <div id="control-panel">
+          <h3 class="panel-title">Control Panel</h3>
+          <p>Controls will be added here for constraint manipulation.</p>
+        </div>
+        
+        <div id="output-panel">
+          <h3 class="panel-title">Output Panel</h3>
+          <p>Status information and results will be displayed here.</p>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <p>
+          <a href="../index.html">← Back to Demo Index</a>
+        </p>
+      </div>
+    </div>
+
+    <script type="module" src="./index.ts"></script>
+  </body>
+</html>
