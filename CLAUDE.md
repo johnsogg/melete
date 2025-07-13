@@ -192,6 +192,7 @@ The library has a solid foundation with:
 - Refer to PLANNING.md for long-term architectural thinking
 - Refer to TODO.md for current feature ideas and bug fixes
 - Check individual README files in subdirectories for specific guidance
+- **For debugging running web apps:** Read `docs/chrome-debugging.md` for the complete Chrome debugging workflow
 - Before finishing tasks, run `npm run lint:fix` for formatting
 - Use `npm run check` to ensure all quality checks pass
 - Follow the established patterns in existing code
