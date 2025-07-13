@@ -25,6 +25,83 @@ export const normalize = (vec: Vec): Vec => {
   return { dx: vec.dx / mag, dy: vec.dy / mag };
 };
 
+// Additional mathematical utilities
+export const dotProduct = (v1: Vec, v2: Vec): number =>
+  v1.dx * v2.dx + v1.dy * v2.dy;
+
+export const distanceBetweenPoints = (p1: Pt, p2: Pt): number =>
+  magnitude(direction(p1, p2));
+
+export const distanceSquared = (p1: Pt, p2: Pt): number => {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  return dx * dx + dy * dy;
+};
+
+export const clamp = (value: number, min: number, max: number): number =>
+  Math.max(min, Math.min(max, value));
+
+/**
+ * Calculate the perpendicular distance from a point to a line defined by two points
+ * Returns positive distance, or Infinity for degenerate lines
+ */
+export const distancePointToLine = (
+  point: Pt,
+  lineStart: Pt,
+  lineEnd: Pt
+): number => {
+  const lineLength = magnitude(direction(lineStart, lineEnd));
+
+  // Handle degenerate line case
+  if (lineLength < 1e-10) {
+    return Infinity;
+  }
+
+  // Calculate perpendicular distance using line equation ax + by + c = 0
+  const A = lineEnd.y - lineStart.y;
+  const B = lineStart.x - lineEnd.x;
+  const C = lineEnd.x * lineStart.y - lineStart.x * lineEnd.y;
+
+  return Math.abs(A * point.x + B * point.y + C) / Math.sqrt(A * A + B * B);
+};
+
+/**
+ * Calculate the angle between two lines in radians
+ * Returns the acute angle (0 to π/2)
+ */
+export const angleBetweenLines = (
+  line1Start: Pt,
+  line1End: Pt,
+  line2Start: Pt,
+  line2End: Pt
+): number => {
+  // Calculate direction vectors
+  const vec1 = direction(line1Start, line1End);
+  const vec2 = direction(line2Start, line2End);
+
+  // Calculate magnitudes
+  const mag1 = magnitude(vec1);
+  const mag2 = magnitude(vec2);
+
+  // Handle degenerate cases
+  if (mag1 < 1e-10 || mag2 < 1e-10) {
+    return NaN;
+  }
+
+  // Normalize vectors
+  const norm1 = normalize(vec1);
+  const norm2 = normalize(vec2);
+
+  // Calculate dot product (cosine of angle)
+  const dotProd = dotProduct(norm1, norm2);
+
+  // Clamp to valid range for acos (handle floating point precision issues)
+  const clampedDot = clamp(dotProd, -1, 1);
+
+  // Return acute angle (take absolute value of dot product to get acute angle)
+  return Math.acos(Math.abs(clampedDot));
+};
+
 // Re-export types for convenience
 export type {
   Pt,
