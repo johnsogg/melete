@@ -204,11 +204,6 @@ export class GradientDescentSolver implements ConstraintSolver {
       unflattenPoints(flattened);
 
       iteration++;
-
-      // Yield control periodically for async behavior
-      if (iteration % 10 === 0) {
-        await this._sleep(0);
-      }
     }
 
     // Calculate final errors

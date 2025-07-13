@@ -96,7 +96,7 @@ export const isSegmentSequenceClosed = (sequence: SegmentSequence, tolerance?: n
 - ✅ `lib/constraints/geometry.ts` - Extended geometry operations and data transformation
 - ✅ `lib/constraints/constraints/` - Individual constraint implementations
   - ✅ `pointOnLine.ts` - Point-on-line constraint
-  - ✅ `sameLength.ts` - Same-length constraint  
+  - ✅ `sameLength.ts` - Same-length constraint
   - ✅ `rightAngle.ts` - Right-angle constraint
 
 ### Constraint Types Implemented
@@ -186,3 +186,49 @@ expected. Tests can include:
 This was just a quick list off the top of my head. Please identify other
 meaningful testing opportunities and write tests before writing the application
 code.
+
+## User specifications for phase 3 - Demo
+
+We have /demo/constraints already established. There are three parts:
+
+- A Melete drawing surface
+- A control panel to view and manage constraints
+- A status panel to give more information on selected items
+
+For Phase 3, I'd like the following abilities:
+
+- A button to add a point - it is placed at a random location inside the visible
+  drawing surface, labeled with "A", then "B", and so on. After "Z", roll back
+  to "AA", then "AB", etc.
+- Points are represented with a dot that is just big enough to show its label.
+  Points are labeled with one or two capital letters, so dots must be big enough
+  to accommodate "MM".
+- Dot appearance:
+  - Unselected: light gray background, medium gray border, dark gray text
+  - Selected: light blue background, dark blue border, dark blue text
+  - Highlighted: yellow background, red border, black text
+- Forming selections:
+  - Clicking on nothing clears the selection
+  - Clicking on a dot without keyboard modifiers clears the selection and
+    selects that node
+  - Clicking on a dot with shift held down adds the node to the selection
+- Additional buttons for creating constraints. They are disabled if they would
+  have no effect, based on the current selection.
+  - Point on line: needs three dots selected. After clicking, a dialog asks
+    which roles each point has. E.g. "line start point is ---, line end point is
+    ---, free point is ---".
+  - There will be additional constraint types, but let's get this working first.
+- Control panel will list the current constraints. This panel can scroll
+  horizontally. Each constraint has 'slots' that identify the points by their
+  role in the constraint. For example, the point-on-line constraint has [point,
+  lineStart, lineEnd]. Hovering the mouse over a constraint listing will
+  highlight the related points in the Melete drawing surface. Click a point in
+  the control panel will select it.
+- The bottom panel shows information about either:
+  - Points that are selected, and which constraints they are involved in
+  - If no points are selected, it shows summary statistic of the last solve
+- It is very important that we use the Melete drawing library's API instead of
+  using the canvas API for drawing.
+  - If there is a missing 'draw' function, please stop and ask me what to do. I
+    will likely ask you to add it to the graphics/ code, but I want to know this
+    is happening.
